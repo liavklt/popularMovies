@@ -1,8 +1,11 @@
 package com.example.android.popularmoviesstageone;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,19 +18,20 @@ import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import java.net.URL;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
 
   private RecyclerView rView;
   private RecyclerViewAdapter rcAdapter;
   private ProgressBar mLoadingIndicator;
+  private static boolean CHANGED_PREFERENCES = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    //TODO ADD SETTINGS - SHAREDPREFERENCES?
     rView = findViewById(R.id.rv_movies);
     rView.setHasFixedSize(true);
 
@@ -39,9 +43,18 @@ public class MainActivity extends AppCompatActivity {
     rView.setAdapter(rcAdapter);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
+    PreferenceManager.getDefaultSharedPreferences(this);
+
     URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
 
     new FetchMoviesAsyncTask().execute(urlPopularMovies);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    PreferenceManager.getDefaultSharedPreferences(this)
+        .unregisterOnSharedPreferenceChangeListener(this);
   }
 
   @Override
@@ -54,9 +67,16 @@ public class MainActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
     if (id == R.id.action_settings) {
+      Intent settingsIntent = new Intent(this, SettingsActivity.class);
+      startActivity(settingsIntent);
       return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    CHANGED_PREFERENCES = true;
   }
 
   public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {

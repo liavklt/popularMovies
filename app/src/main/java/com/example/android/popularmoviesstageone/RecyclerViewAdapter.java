@@ -41,7 +41,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
   @Override
   public void onBindViewHolder(RecyclerViewAdapter.ViewHolder holder, int position) {
 
-    Log.d(LOG_TAG, "#" + position);
+    Log.d(LOG_TAG, movies.get(position).getTitle());
 
     String posterUrl = POSTER_BASE_URL + POSTER_SIZE + movies.get(position).getPosterUrl();
     Picasso.with(context).load(posterUrl).into(holder.listMovieItemView);

@@ -15,6 +15,7 @@ public class JsonUtils {
 
   private static String RESULTS = "results";
   private static String POSTER_PATH = "poster_path";
+  private static String TITLE = "title";
 
   public static List<Movie> getSimpleWeatherStringsFromJson(String jsonStr)
       throws JSONException {
@@ -26,7 +27,9 @@ public class JsonUtils {
 
       JSONObject movieInfo = results.getJSONObject(i);
       String posterUrl = movieInfo.getString(POSTER_PATH);
+      String title = movieInfo.getString(TITLE);
       movie.setPosterUrl(posterUrl);
+      movie.setTitle(title);
 
       movies.add(movie);
     }
