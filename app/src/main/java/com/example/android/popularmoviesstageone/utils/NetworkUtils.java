@@ -19,8 +19,7 @@ public class NetworkUtils {
   private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
 
 
-  private static final String POPULAR_MOVIES = "/movie/popular";
-  private static final String TOP_RATED_MOVIES = "/movie/top_rated";
+
   private static final String BASE_URL = "https://api.themoviedb.org/3";
   private static final String language = "en-US";
   private static final String page = "1";
@@ -30,10 +29,10 @@ public class NetworkUtils {
   final static String PAGE_PARAM = "page";
 
 
-  public static URL buildUrlPopularMovies() {
+  public static URL buildUrl(String param){
     String apiKey = BuildConfig.API_KEY;
 
-    Uri builtUri = Uri.parse(BASE_URL + POPULAR_MOVIES).buildUpon()
+    Uri builtUri = Uri.parse(BASE_URL + param).buildUpon()
         .appendQueryParameter(API_KEY_PARAM, apiKey)
         .appendQueryParameter(LANGUAGE_PARAM, language)
         .appendQueryParameter(PAGE_PARAM, page)
@@ -50,6 +49,27 @@ public class NetworkUtils {
 
     return url;
   }
+
+//  public static URL buildUrlPopularMovies() {
+//    String apiKey = BuildConfig.API_KEY;
+//
+//    Uri builtUri = Uri.parse(BASE_URL + POPULAR_MOVIES).buildUpon()
+//        .appendQueryParameter(API_KEY_PARAM, apiKey)
+//        .appendQueryParameter(LANGUAGE_PARAM, language)
+//        .appendQueryParameter(PAGE_PARAM, page)
+//        .build();
+//
+//    URL url = null;
+//    try {
+//      url = new URL(builtUri.toString());
+//    } catch (MalformedURLException e) {
+//      e.printStackTrace();
+//    }
+//
+//    Log.v(LOG_TAG, "Built URI " + url);
+//
+//    return url;
+//  }
 
   public static String getResponseFromHttpUrl(URL url) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

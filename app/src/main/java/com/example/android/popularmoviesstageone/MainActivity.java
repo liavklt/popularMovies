@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity implements
   private RecyclerViewAdapter rcAdapter;
   private ProgressBar mLoadingIndicator;
   private static boolean CHANGED_PREFERENCES = false;
+  private static final String POPULAR_MOVIES = "/movie/popular";
+  private static final String TOP_RATED_MOVIES = "/movie/top_rated";
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +46,10 @@ public class MainActivity extends AppCompatActivity implements
     rView.setAdapter(rcAdapter);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-    PreferenceManager.getDefaultSharedPreferences(this);
+    PreferenceManager
+        .getDefaultSharedPreferences(this);
 
-    URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
+    URL urlPopularMovies = NetworkUtils.buildUrl(POPULAR_MOVIES);
 
     new FetchMoviesAsyncTask().execute(urlPopularMovies);
   }
@@ -75,8 +79,28 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   @Override
+  protected void onResume() {
+    super.onResume();
+    SharedPreferences sharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    String value = sharedPreferences.getString(getString(R.string.sort_order_key),"");
+    if(TOP_RATED_MOVIES.equals(value)){
+      URL urlTopRatedMovies = NetworkUtils.buildUrl(TOP_RATED_MOVIES);
+
+      new FetchMoviesAsyncTask().execute(urlTopRatedMovies);
+    }else if(POPULAR_MOVIES.equals(value)){
+      URL urlPopularMovies = NetworkUtils.buildUrl(POPULAR_MOVIES);
+
+      new FetchMoviesAsyncTask().execute(urlPopularMovies);
+    }
+
+  }
+
+  @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-    CHANGED_PREFERENCES = true;
+    String value = sharedPreferences.getString(key, "");
+
+
   }
 
   public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {
@@ -109,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements
         rView.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         rcAdapter.setMovieData(movies);
+        rcAdapter.notifyDataSetChanged();
 
       }
     }
