@@ -12,6 +12,7 @@ public class DetailsActivity extends AppCompatActivity {
   private static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
   private static final String POSTER_SIZE = "w185";
   private static final String BACKDROP_SIZE = "w500";
+  private static String LOG_TAG = DetailsActivity.class.getSimpleName();
   ImageView backdropImageView;
   ImageView posterImageView;
   TextView originalTitleTextView;
@@ -41,7 +42,8 @@ public class DetailsActivity extends AppCompatActivity {
     Picasso.with(this).load(backdropPosterUrl).into(backdropImageView);
 
     originalTitleTextView.setText(movie.getOriginalTitle());
-    userRatingTextView.setText(movie.getUserRating().toString());
+    String userRatingString = movie.getUserRating().toString();
+    userRatingTextView.setText(userRatingString);
     releaseDateTextView.setText(movie.getReleaseDate());
     plotTextView.setText(movie.getPlot());
   }
