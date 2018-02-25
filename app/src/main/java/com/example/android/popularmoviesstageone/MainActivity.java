@@ -21,11 +21,11 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-
-  private RecyclerView rView;
-  private RecyclerViewAdapter rcAdapter;
+  public static boolean CHANGED_PREFERENCES = false;
+  private static String LOG_TAG = MainActivity.class.getSimpleName();
+  private RecyclerView recyclerView;
+  private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
-  private static boolean CHANGED_PREFERENCES = false;
   private static final String POPULAR_MOVIES = "/movie/popular";
   private static final String TOP_RATED_MOVIES = "/movie/top_rated";
 
@@ -35,23 +35,36 @@ public class MainActivity extends AppCompatActivity implements
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    rView = findViewById(R.id.rv_movies);
-    rView.setHasFixedSize(true);
+    recyclerView = findViewById(R.id.rv_movies);
+    recyclerView.setHasFixedSize(true);
 
     GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2,
         LinearLayoutManager.VERTICAL, false);
-    rView.setLayoutManager(gridLayoutManager);
+    recyclerView.setLayoutManager(gridLayoutManager);
 
-    rcAdapter = new RecyclerViewAdapter(this);
-    rView.setAdapter(rcAdapter);
+    adapter = new RecyclerViewAdapter(this);
+    recyclerView.setAdapter(adapter);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
     PreferenceManager
         .getDefaultSharedPreferences(this);
 
-    URL urlPopularMovies = NetworkUtils.buildUrl(POPULAR_MOVIES);
+    loadMoviePosters();
+  }
 
-    new FetchMoviesAsyncTask().execute(urlPopularMovies);
+  private void loadMoviePosters() {
+    SharedPreferences sharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
+    URL moviePosterUrl = null;
+    if (TOP_RATED_MOVIES.equals(value)) {
+      moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED_MOVIES);
+    } else if (POPULAR_MOVIES.equals(value)) {
+      moviePosterUrl = NetworkUtils.buildUrl(POPULAR_MOVIES);
+    }
+    new FetchMoviesAsyncTask().execute(moviePosterUrl);
+
+
   }
 
   @Override
@@ -81,27 +94,15 @@ public class MainActivity extends AppCompatActivity implements
   @Override
   protected void onResume() {
     super.onResume();
-    SharedPreferences sharedPreferences = PreferenceManager
-        .getDefaultSharedPreferences(this);
-    String value = sharedPreferences.getString(getString(R.string.sort_order_key),"");
-    if(TOP_RATED_MOVIES.equals(value)){
-      URL urlTopRatedMovies = NetworkUtils.buildUrl(TOP_RATED_MOVIES);
 
-      new FetchMoviesAsyncTask().execute(urlTopRatedMovies);
-    }else if(POPULAR_MOVIES.equals(value)){
-      URL urlPopularMovies = NetworkUtils.buildUrl(POPULAR_MOVIES);
-
-      new FetchMoviesAsyncTask().execute(urlPopularMovies);
-    }
 
   }
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-    String value = sharedPreferences.getString(key, "");
-
 
   }
+
 
   public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {
 
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements
       List<Movie> movies;
       try {
         jsonString = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
-        movies = JsonUtils.getSimpleWeatherStringsFromJson(jsonString);
+        movies = JsonUtils.getStringsFromJson(jsonString);
       } catch (Exception e) {
         e.printStackTrace();
         return null;
@@ -130,10 +131,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPostExecute(List<Movie> movies) {
       if (movies != null) {
-        rView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        rcAdapter.setMovieData(movies);
-        rcAdapter.notifyDataSetChanged();
+        adapter.setMovieData(movies);
+        adapter.notifyDataSetChanged();
 
       }
     }

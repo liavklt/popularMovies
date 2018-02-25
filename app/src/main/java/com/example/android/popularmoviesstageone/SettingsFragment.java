@@ -1,6 +1,5 @@
 package com.example.android.popularmoviesstageone;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.CheckBoxPreference;
@@ -15,7 +14,6 @@ import android.support.v7.preference.PreferenceScreen;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements
     SharedPreferences.OnSharedPreferenceChangeListener {
-  public static boolean CHANGED_PREFERENCES = false;
 
 
   @Override
@@ -36,10 +34,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     if (null != preference) {
       if (!(preference instanceof CheckBoxPreference)) {
         String value = sharedPreferences.getString(preference.getKey(), "");
-
         sharedPreferences.edit().putString("sort_order", value).apply();
         setPreferenceSummary(preference, value);
-
+        MainActivity.CHANGED_PREFERENCES = true;
       }
     }
   }

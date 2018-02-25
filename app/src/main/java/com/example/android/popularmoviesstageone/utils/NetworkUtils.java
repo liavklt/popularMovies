@@ -50,27 +50,6 @@ public class NetworkUtils {
     return url;
   }
 
-//  public static URL buildUrlPopularMovies() {
-//    String apiKey = BuildConfig.API_KEY;
-//
-//    Uri builtUri = Uri.parse(BASE_URL + POPULAR_MOVIES).buildUpon()
-//        .appendQueryParameter(API_KEY_PARAM, apiKey)
-//        .appendQueryParameter(LANGUAGE_PARAM, language)
-//        .appendQueryParameter(PAGE_PARAM, page)
-//        .build();
-//
-//    URL url = null;
-//    try {
-//      url = new URL(builtUri.toString());
-//    } catch (MalformedURLException e) {
-//      e.printStackTrace();
-//    }
-//
-//    Log.v(LOG_TAG, "Built URI " + url);
-//
-//    return url;
-//  }
-
   public static String getResponseFromHttpUrl(URL url) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
     try {
