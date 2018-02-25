@@ -36,7 +36,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         String value = sharedPreferences.getString(preference.getKey(), "");
         sharedPreferences.edit().putString("sort_order", value).apply();
         setPreferenceSummary(preference, value);
-        MainActivity.CHANGED_PREFERENCES = true;
       }
     }
   }

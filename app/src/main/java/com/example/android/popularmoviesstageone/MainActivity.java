@@ -21,14 +21,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-  public static boolean CHANGED_PREFERENCES = false;
+  private static final String POPULAR_MOVIES = "/movie/popular";
+  private static final String TOP_RATED_MOVIES = "/movie/top_rated";
   private static String LOG_TAG = MainActivity.class.getSimpleName();
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
-  private static final String POPULAR_MOVIES = "/movie/popular";
-  private static final String TOP_RATED_MOVIES = "/movie/top_rated";
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +86,11 @@ public class MainActivity extends AppCompatActivity implements
       startActivity(settingsIntent);
       return true;
     }
+//    if(id == R.id.iv_movie_item){
+//      Intent detailsActivityIntent = new Intent(this,DetailsActivity.class);
+//      startActivity(detailsActivityIntent);
+//      return true;
+//    }
     return super.onOptionsItemSelected(item);
   }
 

@@ -2,13 +2,13 @@ package com.example.android.popularmoviesstageone;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
@@ -72,7 +72,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onClick(View view) {
-      Toast.makeText(view.getContext(), "Clicked!", Toast.LENGTH_SHORT).show();
+      Intent detailsActivityIntent = new Intent(view.getContext(), DetailsActivity.class);
+      int clickPosition = getAdapterPosition();
+
+      Movie movie = movies.get(clickPosition);
+      detailsActivityIntent.putExtra("movie", movie);
+      view.getContext().startActivity(detailsActivityIntent);
     }
 
   }

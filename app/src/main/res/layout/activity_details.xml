@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="com.example.android.popularmoviesstageone.DetailsActivity">
+
+    <ImageView
+      android:id="@+id/backdrop_path_poster"
+      android:layout_width="match_parent"
+      android:layout_height="116dp"
+      android:scaleType="centerCrop"
+      />
+    <GridLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+      <ImageView
+        android:id="@+id/poster"
+        android:layout_width="106dp"
+        android:layout_height="116dp"
+        />
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+          android:id="@+id/original_title"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="original_title"/>
+        <TextView
+          android:id="@+id/user_rating"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="user_rating"/>
+        <TextView
+          android:id="@+id/release_date"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="release_date"/>
+      </LinearLayout>
+    </GridLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+      <TextView
+        android:id="@+id/plot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="plot"/>
+    </LinearLayout>
+  </LinearLayout>
+</ScrollView>
+
