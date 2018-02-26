@@ -3,6 +3,7 @@ package com.example.android.popularmoviesstageone;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
@@ -46,5 +47,14 @@ public class DetailsActivity extends AppCompatActivity {
     userRatingTextView.setText(userRatingString);
     releaseDateTextView.setText(movie.getReleaseDate());
     plotTextView.setText(movie.getPlot());
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int itemId = item.getItemId();
+    if (itemId == android.R.id.home) {
+      onBackPressed();
+    }
+    return super.onOptionsItemSelected(item);
   }
 }

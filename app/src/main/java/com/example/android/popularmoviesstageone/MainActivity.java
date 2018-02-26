@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,10 +24,14 @@ public class MainActivity extends AppCompatActivity implements
 
   private static final String POPULAR_MOVIES = "/movie/popular";
   private static final String TOP_RATED_MOVIES = "/movie/top_rated";
+  public static int index = -1;
+  public static int top = -1;
   private static String LOG_TAG = MainActivity.class.getSimpleName();
+  Parcelable parcelable;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
+  private GridLayoutManager gridLayoutManager;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements
     recyclerView = findViewById(R.id.rv_movies);
     recyclerView.setHasFixedSize(true);
 
-    GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2,
+    gridLayoutManager = new GridLayoutManager(this, 2,
         LinearLayoutManager.VERTICAL, false);
     recyclerView.setLayoutManager(gridLayoutManager);
 
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements
 
     loadMoviePosters();
   }
+
 
   private void loadMoviePosters() {
     SharedPreferences sharedPreferences = PreferenceManager
@@ -63,6 +69,14 @@ public class MainActivity extends AppCompatActivity implements
     new FetchMoviesAsyncTask().execute(moviePosterUrl);
 
 
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    index = gridLayoutManager.findFirstVisibleItemPosition();
+    View v = recyclerView.getChildAt(0);
+    top = (v == null) ? 0 : (v.getTop() - recyclerView.getPaddingTop());
   }
 
   @Override
@@ -97,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements
   @Override
   protected void onResume() {
     super.onResume();
-
+    if (index != -1) {
+      gridLayoutManager.scrollToPositionWithOffset(index, top);
+    }
 
   }
 
