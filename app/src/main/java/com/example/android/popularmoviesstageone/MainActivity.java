@@ -24,10 +24,9 @@ public class MainActivity extends AppCompatActivity implements
 
   private static final String POPULAR = "/movie/popular";
   private static final String TOP_RATED = "/movie/top_rated";
-  private static final int ACTIVITY_CONSTANT = 0;
   private static int index = -1;
   private static int top = -1;
-  private static boolean settingsChanged;
+  private static boolean SETTINGS_CHANGED = false;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
@@ -49,8 +48,8 @@ public class MainActivity extends AppCompatActivity implements
     recyclerView.setAdapter(adapter);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-    PreferenceManager
-        .getDefaultSharedPreferences(this);
+    PreferenceManager.getDefaultSharedPreferences(this)
+        .registerOnSharedPreferenceChangeListener(this);
 
     loadMoviePosters();
   }
@@ -96,7 +95,8 @@ public class MainActivity extends AppCompatActivity implements
     if (id == R.id.action_settings) {
       Intent settingsIntent = new Intent(this, SettingsActivity.class);
       settingsIntent.putExtra(getString(R.string.changed_settings), false);
-      startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
+//      startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
+      startActivity(settingsIntent);
       return true;
     }
     return super.onOptionsItemSelected(item);
@@ -105,30 +105,32 @@ public class MainActivity extends AppCompatActivity implements
   @Override
   protected void onResume() {
     super.onResume();
-    if (settingsChanged) {
+    if (SETTINGS_CHANGED) {
+      loadMoviePosters();
       gridLayoutManager.scrollToPosition(0);
+      SETTINGS_CHANGED = false;
     } else if (index != -1) {
       gridLayoutManager.scrollToPositionWithOffset(index, top);
     }
   }
 
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (resultCode == RESULT_OK && requestCode == ACTIVITY_CONSTANT) {
-      if (data.hasExtra(getString(R.string.changed_settings))) {
-        settingsChanged = data.getBooleanExtra(getString(R.string.changed_settings), false);
-        //TODO Investigate: instead of a variable allover class, consider method that does the trick?
-        if (settingsChanged) {
-          loadMoviePosters();
-        }
-      }
-    }
-
-    super.onActivityResult(requestCode, resultCode, data);
-  }
+//  @Override
+//  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//    if (resultCode == RESULT_OK && requestCode == ACTIVITY_CONSTANT) {
+//      if (data.hasExtra(getString(R.string.changed_settings))) {
+////        SETTINGS_CHANGED = data.getBooleanExtra(getString(R.string.changed_settings), false);
+//        if (SETTINGS_CHANGED) {
+//          loadMoviePosters();
+//        }
+//      }
+//    }
+//
+//    super.onActivityResult(requestCode, resultCode, data);
+//  }
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    SETTINGS_CHANGED = true;
   }
 
 
@@ -162,9 +164,6 @@ public class MainActivity extends AppCompatActivity implements
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         adapter.setMovieData(movies);
         adapter.notifyDataSetChanged();
-        settingsChanged = false;
-
-
       }
     }
   }

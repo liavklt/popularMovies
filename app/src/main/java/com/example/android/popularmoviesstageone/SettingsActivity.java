@@ -21,7 +21,6 @@ public class SettingsActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     int itemId = item.getItemId();
     if (itemId == android.R.id.home) {
-      finish();
       onBackPressed();
     }
 
