@@ -18,24 +18,18 @@ public class NetworkUtils {
 
   private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
 
-
-
   private static final String BASE_URL = "https://api.themoviedb.org/3";
   private static final String language = "en-US";
-  private static final String page = "1";
 
-  final static String API_KEY_PARAM = "api_key";
-  final static String LANGUAGE_PARAM = "language";
-  final static String PAGE_PARAM = "page";
+  private final static String API_KEY_PARAM = "api_key";
+  private final static String LANGUAGE_PARAM = "language";
 
-
-  public static URL buildUrl(String param){
+  public static URL buildUrl(String param) {
     String apiKey = BuildConfig.API_KEY;
 
     Uri builtUri = Uri.parse(BASE_URL + param).buildUpon()
         .appendQueryParameter(API_KEY_PARAM, apiKey)
         .appendQueryParameter(LANGUAGE_PARAM, language)
-        .appendQueryParameter(PAGE_PARAM, page)
         .build();
 
     URL url = null;

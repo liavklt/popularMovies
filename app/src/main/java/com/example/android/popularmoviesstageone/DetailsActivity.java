@@ -2,24 +2,26 @@ package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.example.android.popularmoviesstageone.model.Movie;
 import com.squareup.picasso.Picasso;
 
 public class DetailsActivity extends AppCompatActivity {
 
-  private static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
-  private static final String POSTER_SIZE = "w185";
-  private static final String BACKDROP_SIZE = "w500";
-  private static String LOG_TAG = DetailsActivity.class.getSimpleName();
+  public static final String EXTRA_POSITION = "extra_position";
+  private static final int DEFAULT_POSITION = -1;
   ImageView backdropImageView;
   ImageView posterImageView;
   TextView originalTitleTextView;
   TextView userRatingTextView;
   TextView releaseDateTextView;
   TextView plotTextView;
+  Movie movie;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +30,10 @@ public class DetailsActivity extends AppCompatActivity {
     this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     Intent intent = getIntent();
-    Movie movie = intent.getParcelableExtra("movie");
+    if (intent == null) {
+      closeOnError();
+    }
+    movie = intent.getParcelableExtra("movie");
     backdropImageView = findViewById(R.id.backdrop_path_poster);
     posterImageView = findViewById(R.id.poster);
     originalTitleTextView = findViewById(R.id.original_title);
@@ -36,11 +41,20 @@ public class DetailsActivity extends AppCompatActivity {
     releaseDateTextView = findViewById(R.id.release_date);
     plotTextView = findViewById(R.id.plot);
 
-    String posterUrl = POSTER_BASE_URL + POSTER_SIZE + movie.getPosterUrl();
-    Picasso.with(this).load(posterUrl).into(posterImageView);
+    populateUI();
+  }
 
-    String backdropPosterUrl = POSTER_BASE_URL + BACKDROP_SIZE + movie.getBackdropPathUrl();
-    Picasso.with(this).load(backdropPosterUrl).into(backdropImageView);
+  private void closeOnError() {
+    finish();
+    Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+  }
+
+  private void populateUI() {
+    String posterSize = getString(R.string.poster_size);
+    loadImage(posterSize, movie.getPosterUrl(), posterImageView);
+
+    String backdropSize = getString(R.string.backdrop_size);
+    loadImage(backdropSize, movie.getBackdropPathUrl(), backdropImageView);
 
     originalTitleTextView.setText(movie.getOriginalTitle());
     String userRatingString = movie.getUserRating().toString();
@@ -49,12 +63,21 @@ public class DetailsActivity extends AppCompatActivity {
     plotTextView.setText(movie.getPlot());
   }
 
+  private void loadImage(String posterSize, String posterPath, ImageView imageView) {
+    String imageBaseUrl = getString(R.string.image_base_url);
+    String imageUrl = imageBaseUrl + posterSize + posterPath;
+    Picasso.with(this).load(imageUrl).into(imageView);
+  }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int itemId = item.getItemId();
     if (itemId == android.R.id.home) {
-      onBackPressed();
+      NavUtils.navigateUpFromSameTask(this);
+      return true;
     }
     return super.onOptionsItemSelected(item);
   }
+
+
 }

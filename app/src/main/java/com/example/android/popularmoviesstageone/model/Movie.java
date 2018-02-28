@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesstageone;
+package com.example.android.popularmoviesstageone.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,7 +8,6 @@ import android.os.Parcelable;
  */
 
 public class Movie implements Parcelable {
-
   public static final Parcelable.Creator<Movie> CREATOR =
       new Parcelable.Creator<Movie>() {
         @Override
@@ -21,13 +20,16 @@ public class Movie implements Parcelable {
           return new Movie[size];
         }
       };
-  String posterUrl;
-  String title;
-  String originalTitle;
-  String plot;
-  Double userRating;
-  String releaseDate;
-  String backdropPathUrl;
+  private String posterUrl;
+  private String title;
+  private String originalTitle;
+  private String plot;
+  private Double userRating;
+  private String releaseDate;
+  private String backdropPathUrl;
+
+  public Movie() {
+  }
 
   public Movie(Parcel source) {
     posterUrl = source.readString();
@@ -36,9 +38,6 @@ public class Movie implements Parcelable {
     originalTitle = source.readString();
     releaseDate = source.readString();
     userRating = source.readDouble();
-  }
-
-  public Movie() {
   }
 
   public Double getUserRating() {
@@ -110,6 +109,5 @@ public class Movie implements Parcelable {
     dest.writeString(originalTitle);
     dest.writeString(releaseDate);
     dest.writeDouble(userRating);
-
   }
 }

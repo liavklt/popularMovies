@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.utils.JsonUtils;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import java.net.URL;
@@ -22,12 +22,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-  private static final String POPULAR_MOVIES = "/movie/popular";
-  private static final String TOP_RATED_MOVIES = "/movie/top_rated";
-  public static int index = -1;
-  public static int top = -1;
-  private static String LOG_TAG = MainActivity.class.getSimpleName();
-  Parcelable parcelable;
+  private static final String POPULAR = "/movie/popular";
+  private static final String TOP_RATED = "/movie/top_rated";
+  private static final int ACTIVITY_CONSTANT = 0;
+  private static int index = -1;
+  private static int top = -1;
+  private static boolean settingsChanged = false;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
@@ -55,20 +55,18 @@ public class MainActivity extends AppCompatActivity implements
     loadMoviePosters();
   }
 
-
   private void loadMoviePosters() {
     SharedPreferences sharedPreferences = PreferenceManager
         .getDefaultSharedPreferences(this);
     String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
     URL moviePosterUrl = null;
-    if (TOP_RATED_MOVIES.equals(value)) {
-      moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED_MOVIES);
-    } else if (POPULAR_MOVIES.equals(value)) {
-      moviePosterUrl = NetworkUtils.buildUrl(POPULAR_MOVIES);
+    if (TOP_RATED.equals(value)) {
+      moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
+    } else if (POPULAR.equals(value)) {
+      moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
     }
+
     new FetchMoviesAsyncTask().execute(moviePosterUrl);
-
-
   }
 
   @Override
@@ -96,30 +94,40 @@ public class MainActivity extends AppCompatActivity implements
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
     if (id == R.id.action_settings) {
-      Intent settingsIntent = new Intent(this, SettingsActivity.class);
-      startActivity(settingsIntent);
+      Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+      settingsIntent.putExtra(getString(R.string.changed_settings), false);
+      startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
       return true;
     }
-//    if(id == R.id.iv_movie_item){
-//      Intent detailsActivityIntent = new Intent(this,DetailsActivity.class);
-//      startActivity(detailsActivityIntent);
-//      return true;
-//    }
     return super.onOptionsItemSelected(item);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    if (index != -1) {
+    if (settingsChanged) {
+      gridLayoutManager.scrollToPosition(0);
+    } else if (index != -1) {
       gridLayoutManager.scrollToPositionWithOffset(index, top);
     }
+  }
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (resultCode == RESULT_OK) {
+      if (data.hasExtra(getString(R.string.changed_settings))) {
+        settingsChanged = data.getBooleanExtra(getString(R.string.changed_settings), false);
+        if (settingsChanged) {
+          loadMoviePosters();
+        }
+      }
+    }
+
+    super.onActivityResult(requestCode, resultCode, data);
   }
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
   }
 
 
@@ -143,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements
         e.printStackTrace();
         return null;
       }
-
       return movies;
     }
 
@@ -154,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         adapter.setMovieData(movies);
         adapter.notifyDataSetChanged();
+        settingsChanged = false;
+
 
       }
     }
