@@ -6,10 +6,24 @@
   <string name="sort_order_label">Sort Order</string>
   <string name="pref_order_label_popular">Popular</string>
   <string name="pref_order_label_toprated">Top Rated</string>
-  <string name="pref_order_popular">popular</string>
-  <string name="pref_order_toprated">toprated</string>
+  <string name="pref_order_popular">/movie/popular</string>
+  <string name="pref_order_toprated">/movie/top_rated</string>
 
-  <!-- TODO: Remove or change this placeholder text -->
-  <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="backdrop_size">w500</string>
+  <string name="poster_size">w185</string>
+  <string name="image_base_url">http://image.tmdb.org/t/p/</string>
+
+  <string name="changed_settings">CHANGEDPREFERENCES</string>
+
+  <string name="detail_error_message">Movie data not available</string>
+  <string name="backdropPosterDescription">Backdrop Poster</string>
+  <string name="posterDescription">Movie Poster</string>
+  <string name="movieListItemDescription">Movie List Item Poster</string>
+
+  <string name="originalTitle">Original Title: </string>
+  <string name="releaseDateTitle">Release Date: </string>
+  <string name="userRatingTitle">User Rating: </string>
+  <string name="plotSynopsisTitle">Plot Synopsis: </string>
+
 
 </resources>

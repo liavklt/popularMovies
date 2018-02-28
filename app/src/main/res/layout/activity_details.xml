@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="com.example.android.popularmoviesstageone.DetailsActivity">
+
+    <ImageView
+      android:id="@+id/backdrop_path_poster"
+      android:layout_width="match_parent"
+      android:layout_height="168dp"
+      android:contentDescription="@string/backdropPosterDescription"
+      android:scaleType="centerCrop"
+
+      />
+    <GridLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginTop="-25dp">
+
+      <ImageView
+        android:id="@+id/poster"
+        android:layout_width="106dp"
+        android:layout_height="116dp"
+        android:contentDescription="@string/posterDescription"
+        />
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="25dp"
+        android:orientation="vertical">
+        <GridLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+          <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/originalTitle"/>
+          <TextView
+            android:id="@+id/original_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        </GridLayout>
+        <GridLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+          <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/releaseDateTitle"/>
+          <TextView
+            android:id="@+id/release_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        </GridLayout>
+        <GridLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+          <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/userRatingTitle"/>
+          <TextView
+            android:id="@+id/user_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        </GridLayout>
+
+      </LinearLayout>
+    </GridLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+      <TextView
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/plotSynopsisTitle"/>
+      <TextView
+        android:id="@+id/plot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    </LinearLayout>
+  </LinearLayout>
+</ScrollView>
+

@@ -2,13 +2,13 @@ package com.example.android.popularmoviesstageone;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
+import com.example.android.popularmoviesstageone.model.Movie;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
@@ -18,9 +18,6 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-  private static final String LOG_TAG = RecyclerViewAdapter.class.getSimpleName();
-  private static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
-  private static final String POSTER_SIZE = "w185";
   private Context context;
   private List<Movie> movies;
 
@@ -40,10 +37,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
   @Override
   public void onBindViewHolder(RecyclerViewAdapter.ViewHolder holder, int position) {
-
-    Log.d(LOG_TAG, movies.get(position).getTitle());
-
-    String posterUrl = POSTER_BASE_URL + POSTER_SIZE + movies.get(position).getPosterUrl();
+    String posterUrl =
+        context.getString(R.string.image_base_url) + context.getString(R.string.poster_size)
+            + movies.get(position).getPosterUrl();
     Picasso.with(context).load(posterUrl).into(holder.listMovieItemView);
   }
 
@@ -57,7 +53,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
   public void setMovieData(List<Movie> movieData) {
     movies = movieData;
-    notifyDataSetChanged();
   }
 
   class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -72,8 +67,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onClick(View view) {
-      Toast.makeText(view.getContext(), "Clicked!", Toast.LENGTH_SHORT).show();
-    }
+      Intent detailsActivityIntent = new Intent(view.getContext(), DetailsActivity.class);
+      int clickPosition = getAdapterPosition();
 
+      Movie movie = movies.get(clickPosition);
+      detailsActivityIntent.putExtra("movie", movie);
+      view.getContext().startActivity(detailsActivityIntent);
+    }
   }
 }

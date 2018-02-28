@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.utils.JsonUtils;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import java.net.URL;
@@ -21,33 +22,58 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-
-  private RecyclerView rView;
-  private RecyclerViewAdapter rcAdapter;
+  private static final String POPULAR = "/movie/popular";
+  private static final String TOP_RATED = "/movie/top_rated";
+  private static int index = -1;
+  private static int top = -1;
+  private static boolean SETTINGS_CHANGED = false;
+  private RecyclerView recyclerView;
+  private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
-  private static boolean CHANGED_PREFERENCES = false;
+  private GridLayoutManager gridLayoutManager;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    rView = findViewById(R.id.rv_movies);
-    rView.setHasFixedSize(true);
+    recyclerView = findViewById(R.id.rv_movies);
+    recyclerView.setHasFixedSize(true);
 
-    GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2,
+    gridLayoutManager = new GridLayoutManager(this, 2,
         LinearLayoutManager.VERTICAL, false);
-    rView.setLayoutManager(gridLayoutManager);
+    recyclerView.setLayoutManager(gridLayoutManager);
 
-    rcAdapter = new RecyclerViewAdapter(this);
-    rView.setAdapter(rcAdapter);
+    adapter = new RecyclerViewAdapter(this);
+    recyclerView.setAdapter(adapter);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-    PreferenceManager.getDefaultSharedPreferences(this);
+    PreferenceManager.getDefaultSharedPreferences(this)
+        .registerOnSharedPreferenceChangeListener(this);
 
-    URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
+    loadMoviePosters();
+  }
 
-    new FetchMoviesAsyncTask().execute(urlPopularMovies);
+  private void loadMoviePosters() {
+    SharedPreferences sharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
+    URL moviePosterUrl = null;
+    if (TOP_RATED.equals(value)) {
+      moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
+    } else if (POPULAR.equals(value)) {
+      moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
+    }
+
+    new FetchMoviesAsyncTask().execute(moviePosterUrl);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    index = gridLayoutManager.findFirstVisibleItemPosition();
+    View v = recyclerView.getChildAt(0);
+    top = (v == null) ? 0 : (v.getTop() - recyclerView.getPaddingTop());
   }
 
   @Override
@@ -68,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements
     int id = item.getItemId();
     if (id == R.id.action_settings) {
       Intent settingsIntent = new Intent(this, SettingsActivity.class);
+      settingsIntent.putExtra(getString(R.string.changed_settings), false);
+//      startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
       startActivity(settingsIntent);
       return true;
     }
@@ -75,9 +103,36 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   @Override
-  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-    CHANGED_PREFERENCES = true;
+  protected void onResume() {
+    super.onResume();
+    if (SETTINGS_CHANGED) {
+      loadMoviePosters();
+      gridLayoutManager.scrollToPosition(0);
+      SETTINGS_CHANGED = false;
+    } else if (index != -1) {
+      gridLayoutManager.scrollToPositionWithOffset(index, top);
+    }
   }
+
+//  @Override
+//  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//    if (resultCode == RESULT_OK && requestCode == ACTIVITY_CONSTANT) {
+//      if (data.hasExtra(getString(R.string.changed_settings))) {
+////        SETTINGS_CHANGED = data.getBooleanExtra(getString(R.string.changed_settings), false);
+//        if (SETTINGS_CHANGED) {
+//          loadMoviePosters();
+//        }
+//      }
+//    }
+//
+//    super.onActivityResult(requestCode, resultCode, data);
+//  }
+
+  @Override
+  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    SETTINGS_CHANGED = true;
+  }
+
 
   public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {
 
@@ -94,22 +149,21 @@ public class MainActivity extends AppCompatActivity implements
       List<Movie> movies;
       try {
         jsonString = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
-        movies = JsonUtils.getSimpleWeatherStringsFromJson(jsonString);
+        movies = JsonUtils.getStringsFromJson(jsonString);
       } catch (Exception e) {
         e.printStackTrace();
         return null;
       }
-
       return movies;
     }
 
     @Override
     protected void onPostExecute(List<Movie> movies) {
       if (movies != null) {
-        rView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        rcAdapter.setMovieData(movies);
-
+        adapter.setMovieData(movies);
+        adapter.notifyDataSetChanged();
       }
     }
   }
