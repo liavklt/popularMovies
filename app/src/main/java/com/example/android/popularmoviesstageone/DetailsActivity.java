@@ -13,15 +13,13 @@ import com.squareup.picasso.Picasso;
 
 public class DetailsActivity extends AppCompatActivity {
 
-  public static final String EXTRA_POSITION = "extra_position";
-  private static final int DEFAULT_POSITION = -1;
-  ImageView backdropImageView;
-  ImageView posterImageView;
-  TextView originalTitleTextView;
-  TextView userRatingTextView;
-  TextView releaseDateTextView;
-  TextView plotTextView;
-  Movie movie;
+  private ImageView backdropImageView;
+  private ImageView posterImageView;
+  private TextView originalTitleTextView;
+  private TextView userRatingTextView;
+  private TextView releaseDateTextView;
+  private TextView plotTextView;
+  private Movie movie;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

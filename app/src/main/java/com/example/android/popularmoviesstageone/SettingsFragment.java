@@ -31,13 +31,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
   }
 
   @Override
-  public void onPause() {
-    super.onPause();
-
-
-  }
-
-  @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     Preference preference = findPreference(key);
     if (null != preference) {

@@ -13,14 +13,14 @@ import org.json.JSONObject;
 
 public class JsonUtils {
 
-  private static String RESULTS = "results";
-  private static String POSTER_PATH = "poster_path";
-  private static String TITLE = "title";
-  private static String BACKDROP_PATH = "backdrop_path";
-  private static String ORIGINAL_TITLE = "original_title";
-  private static String USER_RATING = "vote_average";
-  private static String RELEASE_DATE = "release_date";
-  private static String PLOT = "overview";
+  private static final String RESULTS = "results";
+  private static final String POSTER_PATH = "poster_path";
+  private static final String TITLE = "title";
+  private static final String BACKDROP_PATH = "backdrop_path";
+  private static final String ORIGINAL_TITLE = "original_title";
+  private static final String USER_RATING = "vote_average";
+  private static final String RELEASE_DATE = "release_date";
+  private static final String PLOT = "overview";
 
   public static List<Movie> getStringsFromJson(String jsonStr)
       throws JSONException {

@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements
   private static final int ACTIVITY_CONSTANT = 0;
   private static int index = -1;
   private static int top = -1;
-  private static boolean settingsChanged = false;
+  private static boolean settingsChanged;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
     if (id == R.id.action_settings) {
-      Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+      Intent settingsIntent = new Intent(this, SettingsActivity.class);
       settingsIntent.putExtra(getString(R.string.changed_settings), false);
       startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
       return true;
@@ -114,9 +114,10 @@ public class MainActivity extends AppCompatActivity implements
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (resultCode == RESULT_OK) {
+    if (resultCode == RESULT_OK && requestCode == ACTIVITY_CONSTANT) {
       if (data.hasExtra(getString(R.string.changed_settings))) {
         settingsChanged = data.getBooleanExtra(getString(R.string.changed_settings), false);
+        //TODO Investigate: instead of a variable allover class, consider method that does the trick?
         if (settingsChanged) {
           loadMoviePosters();
         }

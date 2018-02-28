@@ -16,4 +16,14 @@
   <string name="changed_settings">CHANGEDPREFERENCES</string>
 
   <string name="detail_error_message">Movie data not available</string>
+  <string name="backdropPosterDescription">Backdrop Poster</string>
+  <string name="posterDescription">Movie Poster</string>
+  <string name="movieListItemDescription">Movie List Item Poster</string>
+
+  <string name="originalTitle">Original Title: </string>
+  <string name="releaseDateTitle">Release Date: </string>
+  <string name="userRatingTitle">User Rating: </string>
+  <string name="plotSynopsisTitle">Plot Synopsis: </string>
+
+
 </resources>
