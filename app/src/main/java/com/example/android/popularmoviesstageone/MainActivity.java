@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements
     if (id == R.id.action_settings) {
       Intent settingsIntent = new Intent(this, SettingsActivity.class);
       settingsIntent.putExtra(getString(R.string.changed_settings), false);
-//      startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
       startActivity(settingsIntent);
       return true;
     }
@@ -113,20 +112,6 @@ public class MainActivity extends AppCompatActivity implements
       gridLayoutManager.scrollToPositionWithOffset(index, top);
     }
   }
-
-//  @Override
-//  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//    if (resultCode == RESULT_OK && requestCode == ACTIVITY_CONSTANT) {
-//      if (data.hasExtra(getString(R.string.changed_settings))) {
-////        SETTINGS_CHANGED = data.getBooleanExtra(getString(R.string.changed_settings), false);
-//        if (SETTINGS_CHANGED) {
-//          loadMoviePosters();
-//        }
-//      }
-//    }
-//
-//    super.onActivityResult(requestCode, resultCode, data);
-//  }
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

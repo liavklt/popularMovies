@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesstageone.utils;
 
 import com.example.android.popularmoviesstageone.model.Movie;
+import com.example.android.popularmoviesstageone.model.Video;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
@@ -21,6 +22,7 @@ public class JsonUtils {
   private static final String USER_RATING = "vote_average";
   private static final String RELEASE_DATE = "release_date";
   private static final String PLOT = "overview";
+  private static final String ID = "id";
 
   public static List<Movie> getStringsFromJson(String jsonStr)
       throws JSONException {
@@ -38,6 +40,32 @@ public class JsonUtils {
     return movies;
   }
 
+  public static List<Video> getVideosFromJson(String jsonString) throws JSONException {
+    JSONObject videoJson = new JSONObject(jsonString);
+    JSONArray results = videoJson.getJSONArray(RESULTS);
+    List<Video> videos = new ArrayList<>();
+    for (int i = 0; i < results.length(); i++) {
+      JSONObject videoInfo = results.getJSONObject(i);
+      Video video = populateVideosFromJsonObject(videoInfo);
+      videos.add(video);
+
+    }
+    return videos;
+  }
+
+  private static Video populateVideosFromJsonObject(JSONObject videoInfo) throws JSONException {
+    Video video = new Video();
+    String id = videoInfo.getString(ID);
+    String name = videoInfo.getString("name");
+    String type = videoInfo.getString("type");
+
+    video.setId(id);
+    video.setName(name);
+    video.setType(type);
+    return video;
+  }
+
+
   private static Movie populateMovieFromJsonObject(JSONObject movieInfo) throws JSONException {
     Movie movie = new Movie();
     String posterUrl = movieInfo.getString(POSTER_PATH);
@@ -47,6 +75,7 @@ public class JsonUtils {
     Double userRating = movieInfo.getDouble(USER_RATING);
     String releaseDate = movieInfo.getString(RELEASE_DATE);
     String plot = movieInfo.getString(PLOT);
+    Long id = movieInfo.getLong(ID);
 
     movie.setPosterUrl(posterUrl);
     movie.setTitle(title);
@@ -55,6 +84,7 @@ public class JsonUtils {
     movie.setUserRating(userRating);
     movie.setReleaseDate(releaseDate);
     movie.setPlot(plot);
+    movie.setId(id);
     return movie;
   }
 }

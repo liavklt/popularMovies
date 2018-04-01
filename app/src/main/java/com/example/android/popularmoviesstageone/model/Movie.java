@@ -8,6 +8,7 @@ import android.os.Parcelable;
  */
 
 public class Movie implements Parcelable {
+
   public static final Parcelable.Creator<Movie> CREATOR =
       new Parcelable.Creator<Movie>() {
         @Override
@@ -27,6 +28,7 @@ public class Movie implements Parcelable {
   private Double userRating;
   private String releaseDate;
   private String backdropPathUrl;
+  private Long id;
 
   public Movie() {
   }
@@ -38,6 +40,7 @@ public class Movie implements Parcelable {
     originalTitle = source.readString();
     releaseDate = source.readString();
     userRating = source.readDouble();
+    id = source.readLong();
   }
 
   public Double getUserRating() {
@@ -96,6 +99,14 @@ public class Movie implements Parcelable {
     this.title = title;
   }
 
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   @Override
   public int describeContents() {
     return 0;
@@ -109,5 +120,6 @@ public class Movie implements Parcelable {
     dest.writeString(originalTitle);
     dest.writeString(releaseDate);
     dest.writeDouble(userRating);
+    dest.writeLong(id);
   }
 }

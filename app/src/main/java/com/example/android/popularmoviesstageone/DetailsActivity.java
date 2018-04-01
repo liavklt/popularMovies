@@ -1,15 +1,24 @@
 package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.android.popularmoviesstageone.model.Movie;
+import com.example.android.popularmoviesstageone.model.Video;
+import com.example.android.popularmoviesstageone.utils.JsonUtils;
+import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import com.squareup.picasso.Picasso;
+import java.net.URL;
+import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -19,7 +28,11 @@ public class DetailsActivity extends AppCompatActivity {
   private TextView userRatingTextView;
   private TextView releaseDateTextView;
   private TextView plotTextView;
+  private TextView videosTextView;
   private Movie movie;
+  private RecyclerView trailerRecyclerView;
+  private LinearLayoutManager linearLayoutManager;
+  private TrailerRecyclerViewAdapter adapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +53,29 @@ public class DetailsActivity extends AppCompatActivity {
     plotTextView = findViewById(R.id.plot);
 
     populateUI();
+
+    trailerRecyclerView = findViewById(R.id.rv_trailers);
+    trailerRecyclerView.setHasFixedSize(true);
+
+    linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    trailerRecyclerView.setLayoutManager(linearLayoutManager);
+
+    adapter = new TrailerRecyclerViewAdapter(this);
+    trailerRecyclerView.setAdapter(adapter);
+
+    loadTrailers(movie);
+
   }
+
+  private void loadTrailers(Movie movie) {
+    Long id = movie.getId();
+    URL videosUrl = null;
+    String getVideosUrl = "/movie/" + id.toString() + "/videos";
+    videosUrl = NetworkUtils.buildUrl(getVideosUrl);
+
+    new FetchTrailersAsyncTask().execute(videosUrl);
+  }
+
 
   private void closeOnError() {
     finish();
@@ -78,4 +113,31 @@ public class DetailsActivity extends AppCompatActivity {
   }
 
 
+  private class FetchTrailersAsyncTask extends AsyncTask<URL, Void, List<Video>> {
+
+
+    @Override
+    protected List<Video> doInBackground(URL... urls) {
+      URL trailerRequestUrl = urls[0];
+      String jsonString;
+      List<Video> trailers;
+      try {
+        jsonString = NetworkUtils.getResponseFromHttpUrl(trailerRequestUrl);
+        trailers = JsonUtils.getVideosFromJson(jsonString);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+      }
+      return trailers;
+    }
+
+    @Override
+    protected void onPostExecute(List<Video> videos) {
+      if (videos != null) {
+        trailerRecyclerView.setVisibility(View.VISIBLE);
+        adapter.setVideoData(videos);
+        adapter.notifyDataSetChanged();
+      }
+    }
+  }
 }
