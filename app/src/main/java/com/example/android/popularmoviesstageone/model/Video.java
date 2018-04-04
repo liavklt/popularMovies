@@ -9,6 +9,7 @@ public class Video {
   private String id;
   private String name;
   private String type;
+  private String key;
 
 
   public String getId() {
@@ -35,5 +36,13 @@ public class Video {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
   }
 }

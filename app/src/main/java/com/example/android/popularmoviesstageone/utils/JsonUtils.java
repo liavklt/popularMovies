@@ -58,10 +58,12 @@ public class JsonUtils {
     String id = videoInfo.getString(ID);
     String name = videoInfo.getString("name");
     String type = videoInfo.getString("type");
+    String key = videoInfo.getString("key");
 
     video.setId(id);
     video.setName(name);
     video.setType(type);
+    video.setKey(key);
     return video;
   }
 

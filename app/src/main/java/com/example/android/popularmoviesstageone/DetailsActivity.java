@@ -69,7 +69,7 @@ public class DetailsActivity extends AppCompatActivity {
 
   private void loadTrailers(Movie movie) {
     Long id = movie.getId();
-    URL videosUrl = null;
+    URL videosUrl;
     String getVideosUrl = "/movie/" + id.toString() + "/videos";
     videosUrl = NetworkUtils.buildUrl(getVideosUrl);
 
