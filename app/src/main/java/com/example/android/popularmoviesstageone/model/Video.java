@@ -11,7 +11,6 @@ public class Video {
   private String type;
   private String key;
 
-
   public String getId() {
     return id;
   }
@@ -20,7 +19,6 @@ public class Video {
     this.id = id;
   }
 
-
   public String getName() {
     return name;
   }
@@ -28,7 +26,6 @@ public class Video {
   public void setName(String name) {
     this.name = name;
   }
-
 
   public String getType() {
     return type;
@@ -44,5 +41,11 @@ public class Video {
 
   public void setKey(String key) {
     this.key = key;
+  }
+
+  public enum VideoType {
+    TRAILER,
+    TEASER,
+    CLIP
   }
 }

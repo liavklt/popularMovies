@@ -2,6 +2,7 @@ package com.example.android.popularmoviesstageone.utils;
 
 import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.model.Video;
+import com.example.android.popularmoviesstageone.model.Video.VideoType;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
@@ -47,7 +48,9 @@ public class JsonUtils {
     for (int i = 0; i < results.length(); i++) {
       JSONObject videoInfo = results.getJSONObject(i);
       Video video = populateVideosFromJsonObject(videoInfo);
-      videos.add(video);
+      if (VideoType.TRAILER.name().toLowerCase().equals(video.getType().toLowerCase())) {
+        videos.add(video);
+      }
 
     }
     return videos;
