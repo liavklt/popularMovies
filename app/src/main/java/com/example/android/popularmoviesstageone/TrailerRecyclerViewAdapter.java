@@ -65,6 +65,7 @@ public class TrailerRecyclerViewAdapter extends
     TextView listTrailerTextView;
     Button button;
 
+
     public ViewHolder(View itemView) {
       super(itemView);
       listTrailerTextView = itemView.findViewById(R.id.tv_trailer_item);

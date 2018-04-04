@@ -7,18 +7,21 @@
 
   <GridLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="1dp">
     <Button
       android:id="@+id/btn_trailer"
-      android:layout_width="156dp"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_weight="1"/>
+      android:background="#ac2a2a"
+      android:drawableTop="@drawable/ic_media_play"/>
 
     <TextView
       android:id="@+id/tv_trailer_item"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
+
       />
   </GridLayout>
 </LinearLayout>
