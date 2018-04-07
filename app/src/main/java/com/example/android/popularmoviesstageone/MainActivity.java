@@ -2,7 +2,6 @@ package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -15,7 +14,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.android.popularmoviesstageone.model.Movie;
-import com.example.android.popularmoviesstageone.utils.JsonUtils;
+import com.example.android.popularmoviesstageone.utils.AsyncTaskCompleteListener;
+import com.example.android.popularmoviesstageone.utils.FetchMoviesAsyncTask;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import java.net.URL;
 import java.util.List;
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
+
   private GridLayoutManager gridLayoutManager;
 
   @Override
@@ -44,10 +45,10 @@ public class MainActivity extends AppCompatActivity implements
     gridLayoutManager = new GridLayoutManager(this, 2,
         LinearLayoutManager.VERTICAL, false);
     recyclerView.setLayoutManager(gridLayoutManager);
+    mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
     adapter = new RecyclerViewAdapter(this);
     recyclerView.setAdapter(adapter);
-    mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(this);
@@ -70,8 +71,7 @@ public class MainActivity extends AppCompatActivity implements
     } else if (POPULAR.equals(value)) {
       moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
     }
-
-    new FetchMoviesAsyncTask().execute(moviePosterUrl);
+    new FetchMoviesAsyncTask(this, new FetchMoviesTaskCompleteListener()).execute(moviePosterUrl);
   }
 
   @Override
@@ -124,32 +124,16 @@ public class MainActivity extends AppCompatActivity implements
     SETTINGS_CHANGED = true;
   }
 
-
-  public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {
+  public class FetchMoviesTaskCompleteListener implements AsyncTaskCompleteListener<List<Movie>> {
 
     @Override
-    protected void onPreExecute() {
-      super.onPreExecute();
+    public void onTaskPreExecute() {
       mLoadingIndicator.setVisibility(View.VISIBLE);
+
     }
 
     @Override
-    protected List<Movie> doInBackground(URL... urls) {
-      URL movieRequestUrl = urls[0];
-      String jsonString;
-      List<Movie> movies;
-      try {
-        jsonString = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
-        movies = JsonUtils.getStringsFromJson(jsonString);
-      } catch (Exception e) {
-        e.printStackTrace();
-        return null;
-      }
-      return movies;
-    }
-
-    @Override
-    protected void onPostExecute(List<Movie> movies) {
+    public void onTaskComplete(List<Movie> movies) {
       if (movies != null) {
         recyclerView.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
@@ -158,4 +142,5 @@ public class MainActivity extends AppCompatActivity implements
       }
     }
   }
+
 }

@@ -62,7 +62,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     adapter = new TrailerRecyclerViewAdapter(this);
     trailerRecyclerView.setAdapter(adapter);
-
+//TODO add internet connection check
     loadTrailers(movie);
 
   }
