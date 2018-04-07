@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.utils.JsonUtils;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
@@ -51,8 +52,13 @@ public class MainActivity extends AppCompatActivity implements
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(this);
 
-    loadMoviePosters();
+    if (NetworkUtils.isConnected(this)) {
+      loadMoviePosters();
+    } else {
+      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
+    }
   }
+
 
   private void loadMoviePosters() {
     SharedPreferences sharedPreferences = PreferenceManager
