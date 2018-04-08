@@ -63,8 +63,12 @@ public class DetailsActivity extends AppCompatActivity {
 
     adapter = new TrailerRecyclerViewAdapter(this);
     trailerRecyclerView.setAdapter(adapter);
-//TODO add internet connection check
-    loadTrailers(movie);
+    if (NetworkUtils.isConnected(this)) {
+      loadTrailers(movie);
+    } else {
+      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
+    }
+
 
   }
 
