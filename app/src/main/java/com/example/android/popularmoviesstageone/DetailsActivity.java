@@ -1,7 +1,6 @@
 package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.model.Video;
+import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
+import com.example.android.popularmoviesstageone.utils.FetchTrailersAsyncTask;
 import com.example.android.popularmoviesstageone.utils.JsonUtils;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -73,7 +74,7 @@ public class DetailsActivity extends AppCompatActivity {
     String getVideosUrl = "/movie/" + id.toString() + "/videos";
     videosUrl = NetworkUtils.buildUrl(getVideosUrl);
 
-    new FetchTrailersAsyncTask().execute(videosUrl);
+    new FetchTrailersAsyncTask(this, new FetchTrailersTaskListener()).execute(videosUrl);
   }
 
 
@@ -112,17 +113,18 @@ public class DetailsActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-
-  private class FetchTrailersAsyncTask extends AsyncTask<URL, Void, List<Video>> {
-
+  public class FetchTrailersTaskListener implements AsyncTaskListener<List<Video>> {
 
     @Override
-    protected List<Video> doInBackground(URL... urls) {
-      URL trailerRequestUrl = urls[0];
+    public void onTaskPreExecute() {
+    }
+
+    @Override
+    public List<Video> onTaskGetResult(URL url) {
       String jsonString;
       List<Video> trailers;
       try {
-        jsonString = NetworkUtils.getResponseFromHttpUrl(trailerRequestUrl);
+        jsonString = NetworkUtils.getResponseFromHttpUrl(url);
         trailers = JsonUtils.getVideosFromJson(jsonString);
       } catch (Exception e) {
         e.printStackTrace();
@@ -132,7 +134,7 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostExecute(List<Video> videos) {
+    public void onTaskComplete(List<Video> videos) {
       if (videos != null) {
         trailerRecyclerView.setVisibility(View.VISIBLE);
         adapter.setVideoData(videos);
