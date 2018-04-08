@@ -1,6 +1,5 @@
 package com.example.android.popularmoviesstageone;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -76,16 +75,11 @@ public class TrailerRecyclerViewAdapter extends
 
     @Override
     public void onClick(View v) {
-      Intent appIntent = new Intent(Intent.ACTION_VIEW,
-          Uri.parse("vnd.youtube:" + button.getTag(R.id.imageURI)));
       Intent webIntent = new Intent(Intent.ACTION_VIEW,
           Uri.parse("http://www.youtube.com/watch?v=" + button.getTag(R.id.imageURI)));
-      try {
-        context.startActivity(appIntent);
-      } catch (ActivityNotFoundException ex) {
+      if (webIntent.resolveActivity(context.getPackageManager()) != null) {
         context.startActivity(webIntent);
       }
-
     }
   }
 }

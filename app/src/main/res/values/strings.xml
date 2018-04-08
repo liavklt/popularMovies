@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">Popular Movies, Stage1</string>
+  <string name="app_name">Popular Movies, Stage2</string>
   <string name="action_settings">Settings</string>
   <string name="sort_default">Popular</string>
   <string name="sort_order_key">order</string>
