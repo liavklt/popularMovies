@@ -3,6 +3,7 @@ package com.example.android.popularmoviesstageone.utils;
 import android.content.Context;
 import android.os.AsyncTask;
 import com.example.android.popularmoviesstageone.model.Movie;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.List;
 
@@ -14,41 +15,33 @@ public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {
 
   private static final String TAG = "FetchMoviesAsyncTask";
 
-  private Context context;
-  private AsyncTaskCompleteListener<List<Movie>> asyncTaskCompleteListener;
+  private WeakReference<Context> context;
+  private AsyncTaskListener<List<Movie>> asyncTaskListener;
 
 
   public FetchMoviesAsyncTask(Context context,
-      AsyncTaskCompleteListener<List<Movie>> asyncTaskCompleteListener) {
-    this.context = context;
-    this.asyncTaskCompleteListener = asyncTaskCompleteListener;
+      AsyncTaskListener<List<Movie>> asyncTaskListener) {
+    this.context = new WeakReference<>(context);
+    this.asyncTaskListener = asyncTaskListener;
   }
 
   @Override
   protected void onPreExecute() {
     super.onPreExecute();
-    asyncTaskCompleteListener.onTaskPreExecute();
+    asyncTaskListener.onTaskPreExecute();
   }
 
   @Override
   protected List<Movie> doInBackground(URL... urls) {
     URL movieRequestUrl = urls[0];
-    String jsonString;
-    List<Movie> movies;
-    try {
-      jsonString = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
-      movies = JsonUtils.getStringsFromJson(jsonString);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-    return movies;
+    return asyncTaskListener.onTaskGetResult(movieRequestUrl);
+
   }
 
   @Override
   protected void onPostExecute(List<Movie> movies) {
     super.onPostExecute(movies);
-    asyncTaskCompleteListener.onTaskComplete(movies);
+    asyncTaskListener.onTaskComplete(movies);
 
   }
 }

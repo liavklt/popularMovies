@@ -14,8 +14,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.android.popularmoviesstageone.model.Movie;
-import com.example.android.popularmoviesstageone.utils.AsyncTaskCompleteListener;
+import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
 import com.example.android.popularmoviesstageone.utils.FetchMoviesAsyncTask;
+import com.example.android.popularmoviesstageone.utils.JsonUtils;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import java.net.URL;
 import java.util.List;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements
     } else if (POPULAR.equals(value)) {
       moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
     }
-    new FetchMoviesAsyncTask(this, new FetchMoviesTaskCompleteListener()).execute(moviePosterUrl);
+    new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
   }
 
   @Override
@@ -124,12 +125,26 @@ public class MainActivity extends AppCompatActivity implements
     SETTINGS_CHANGED = true;
   }
 
-  public class FetchMoviesTaskCompleteListener implements AsyncTaskCompleteListener<List<Movie>> {
+  public class FetchMoviesTaskListener implements AsyncTaskListener<List<Movie>> {
 
     @Override
     public void onTaskPreExecute() {
       mLoadingIndicator.setVisibility(View.VISIBLE);
 
+    }
+
+    @Override
+    public List<Movie> onTaskGetResult(URL url) {
+      String jsonString;
+      List<Movie> movies;
+      try {
+        jsonString = NetworkUtils.getResponseFromHttpUrl(url);
+        movies = JsonUtils.getStringsFromJson(jsonString);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+      }
+      return movies;
     }
 
     @Override
