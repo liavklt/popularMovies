@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -95,11 +95,6 @@
         android:layout_height="wrap_content"
         />
     </LinearLayout>
-    <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:orientation="vertical">
-    </LinearLayout>
     <TextView
       android:id="@+id/textView"
       android:textStyle="bold"
@@ -111,6 +106,13 @@
       android:id="@+id/rv_trailers"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"/>
+    <fragment
+      android:id="@+id/reviews_fragment"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:name="com.example.android.popularmoviesstageone.ReviewsFragment"
+      tools:layout="@layout/reviews_fragment"/>
+
   </LinearLayout>
 </ScrollView>
 
