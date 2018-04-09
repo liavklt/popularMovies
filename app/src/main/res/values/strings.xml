@@ -6,8 +6,10 @@
   <string name="sort_order_label">Sort Order</string>
   <string name="pref_order_label_popular">Popular</string>
   <string name="pref_order_label_toprated">Top Rated</string>
+  <string name="pref_order_label_favorites">Favorites</string>
   <string name="pref_order_popular">/movie/popular</string>
   <string name="pref_order_toprated">/movie/top_rated</string>
+  <string name="pref_order_favorites"></string>
 
   <string name="backdrop_size">w500</string>
   <string name="poster_size">w185</string>

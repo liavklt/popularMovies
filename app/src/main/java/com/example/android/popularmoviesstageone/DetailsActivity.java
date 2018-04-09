@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +24,7 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 import java.util.List;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements OnClickListener {
 
   private ImageView backdropImageView;
   private ImageView posterImageView;
@@ -35,6 +38,7 @@ public class DetailsActivity extends AppCompatActivity {
   private LinearLayoutManager linearLayoutManager;
   private TrailerRecyclerViewAdapter adapter;
   private RecyclerView reviewRecyclerView;
+  private Button favoritesButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +57,8 @@ public class DetailsActivity extends AppCompatActivity {
     userRatingTextView = findViewById(R.id.user_rating);
     releaseDateTextView = findViewById(R.id.release_date);
     plotTextView = findViewById(R.id.plot);
+    favoritesButton = findViewById(R.id.button_favorite);
+    favoritesButton.setOnClickListener(this);
 
     populateUI();
 
@@ -123,6 +129,18 @@ public class DetailsActivity extends AppCompatActivity {
       return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onClick(View v) {
+    int id = v.getId();
+    if (id == R.id.button_favorite) {
+      //TODO check if already filled or not
+      Toast.makeText(this, "Pressed it! Yay!", Toast.LENGTH_SHORT).show();
+      Drawable top = getResources().getDrawable(R.drawable.ic_star_black_24dp);
+      favoritesButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+
+    }
   }
 
   public class FetchTrailersTaskListener implements AsyncTaskListener<List<Video>> {

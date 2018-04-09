@@ -9,15 +9,26 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context="com.example.android.popularmoviesstageone.DetailsActivity">
-
-    <ImageView
-      android:id="@+id/backdrop_path_poster"
+    <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="168dp"
-      android:contentDescription="@string/backdropPosterDescription"
-      android:scaleType="centerCrop"
-
-      />
+      android:layout_height="wrap_content">
+      <ImageView
+        android:id="@+id/backdrop_path_poster"
+        android:layout_width="match_parent"
+        android:layout_height="168dp"
+        android:contentDescription="@string/backdropPosterDescription"
+        android:scaleType="centerCrop"/>
+      <Button
+        android:id="@+id/button_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="end"
+        android:background="#00000000"
+        android:drawableTop="@drawable/ic_star_border_black_24dp"/>
+    </RelativeLayout>
     <GridLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
