@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesstageone.utils;
 
 import com.example.android.popularmoviesstageone.model.Movie;
+import com.example.android.popularmoviesstageone.model.Review;
 import com.example.android.popularmoviesstageone.model.Video;
 import com.example.android.popularmoviesstageone.model.Video.VideoType;
 import java.util.ArrayList;
@@ -91,5 +92,31 @@ public class JsonUtils {
     movie.setPlot(plot);
     movie.setId(id);
     return movie;
+  }
+
+  public static List<Review> getReviewsFromJson(String jsonString) throws JSONException {
+    JSONObject reviewJson = new JSONObject(jsonString);
+    JSONArray results = reviewJson.getJSONArray(RESULTS);
+    List<Review> reviews = new ArrayList<>();
+    for (int i = 0; i < results.length(); i++) {
+      JSONObject reviewInfo = results.getJSONObject(i);
+      Review review = populateReviewsFromJsonObject(reviewInfo);
+      reviews.add(review);
+    }
+    return reviews;
+  }
+
+  private static Review populateReviewsFromJsonObject(JSONObject reviewInfo) throws JSONException {
+    Review review = new Review();
+    String id = reviewInfo.getString(ID);
+    String author = reviewInfo.getString("author");
+    String content = reviewInfo.getString("content");
+    String url = reviewInfo.getString("url");
+
+    review.setAuthor(author);
+    review.setContent(content);
+    review.setReviewId(id);
+    review.setUrl(url);
+    return review;
   }
 }

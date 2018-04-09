@@ -108,7 +108,7 @@
       android:layout_height="wrap_content"/>
     <fragment
       android:id="@+id/reviews_fragment"
-      android:layout_width="wrap_content"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:name="com.example.android.popularmoviesstageone.ReviewsFragment"
       tools:layout="@layout/reviews_fragment"/>
