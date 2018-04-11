@@ -20,9 +20,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
   private Context context;
   private List<Movie> movies;
+  private int mCount;
 
   public RecyclerViewAdapter(Context context) {
     this.context = context;
+  }
+
+  public RecyclerViewAdapter(Context context, int mCount) {
+    this.context = context;
+    this.mCount = mCount;
   }
 
   @Override

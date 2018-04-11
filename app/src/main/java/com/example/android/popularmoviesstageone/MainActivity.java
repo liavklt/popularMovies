@@ -2,6 +2,8 @@ package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -13,6 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import com.example.android.popularmoviesstageone.data.FavoritesContract;
+import com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry;
+import com.example.android.popularmoviesstageone.data.FavoritesDbHelper;
 import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
 import com.example.android.popularmoviesstageone.utils.FetchMoviesAsyncTask;
@@ -26,12 +31,14 @@ public class MainActivity extends AppCompatActivity implements
 
   private static final String POPULAR = "/movie/popular";
   private static final String TOP_RATED = "/movie/top_rated";
+  private static final String FAVORITES = "favorites";
   private static int index = -1;
   private static int top = -1;
   private static boolean SETTINGS_CHANGED = false;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
   private ProgressBar mLoadingIndicator;
+  private SQLiteDatabase mDb;
 
   private GridLayoutManager gridLayoutManager;
 
@@ -48,11 +55,12 @@ public class MainActivity extends AppCompatActivity implements
     recyclerView.setLayoutManager(gridLayoutManager);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-    adapter = new RecyclerViewAdapter(this);
-    recyclerView.setAdapter(adapter);
+
 
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(this);
+    FavoritesDbHelper favoritesDbHelper = new FavoritesDbHelper(this);
+    mDb = favoritesDbHelper.getWritableDatabase();
 
     if (NetworkUtils.isConnected(this)) {
       loadMoviePosters();
@@ -69,10 +77,21 @@ public class MainActivity extends AppCompatActivity implements
     URL moviePosterUrl = null;
     if (TOP_RATED.equals(value)) {
       moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
+      adapter = new RecyclerViewAdapter(this);
+      recyclerView.setAdapter(adapter);
+      new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
+
     } else if (POPULAR.equals(value)) {
       moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
+      adapter = new RecyclerViewAdapter(this);
+      recyclerView.setAdapter(adapter);
+      new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
+
+    } else if (FAVORITES.equals(value)) {
+      Cursor cursor = getAllFavorites();
+      adapter = new RecyclerViewAdapter(this, cursor.getCount());
+      recyclerView.setAdapter(adapter);
     }
-    new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
   }
 
   @Override
@@ -123,6 +142,18 @@ public class MainActivity extends AppCompatActivity implements
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     SETTINGS_CHANGED = true;
+  }
+
+  public Cursor getAllFavorites() {
+    return mDb.query(
+        FavoritesContract.FavoritesEntry.TABLE_NAME,
+        null,
+        null,
+        null,
+        null,
+        null,
+        FavoritesEntry.COLUMN_MOVIE_TITLE
+    );
   }
 
   public class FetchMoviesTaskListener implements AsyncTaskListener<List<Movie>> {

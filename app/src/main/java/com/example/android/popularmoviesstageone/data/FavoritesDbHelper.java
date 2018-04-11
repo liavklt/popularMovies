@@ -2,7 +2,6 @@ package com.example.android.popularmoviesstageone.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry;
 
@@ -15,9 +14,8 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
   private static final String DATABASE_NAME = "favorites.db";
   private static final int DATABASE_VERSION = 1;
 
-  public FavoritesDbHelper(Context context, String name,
-      CursorFactory factory, int version) {
-    super(context, name, factory, version);
+  public FavoritesDbHelper(Context context) {
+    super(context, DATABASE_NAME, null, DATABASE_VERSION);
   }
 
   @Override
