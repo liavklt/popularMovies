@@ -3,6 +3,7 @@ package com.example.android.popularmoviesstageone;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,15 +21,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
   private Context context;
   private List<Movie> movies;
-  private int mCount;
+  private Cursor cursor;
 
   public RecyclerViewAdapter(Context context) {
     this.context = context;
-  }
-
-  public RecyclerViewAdapter(Context context, int mCount) {
-    this.context = context;
-    this.mCount = mCount;
   }
 
   @Override

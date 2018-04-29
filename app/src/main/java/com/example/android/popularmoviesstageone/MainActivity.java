@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,7 +19,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.android.popularmoviesstageone.data.FavoritesContract;
-import com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry;
 import com.example.android.popularmoviesstageone.data.FavoritesDbHelper;
 import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
@@ -27,7 +29,10 @@ import java.net.URL;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-    SharedPreferences.OnSharedPreferenceChangeListener {
+    SharedPreferences.OnSharedPreferenceChangeListener, LoaderManager.LoaderCallbacks<Cursor> {
+
+  private final static String TAG = MainActivity.class.getSimpleName();
+  private static final int TASK_LOADER_ID = 0;
 
   private static final String POPULAR = "/movie/popular";
   private static final String TOP_RATED = "/movie/top_rated";
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements
   private static boolean SETTINGS_CHANGED = false;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
+  private CustomCursorAdapter cursorAdapter;
   private ProgressBar mLoadingIndicator;
   private SQLiteDatabase mDb;
 
@@ -54,8 +60,6 @@ public class MainActivity extends AppCompatActivity implements
         LinearLayoutManager.VERTICAL, false);
     recyclerView.setLayoutManager(gridLayoutManager);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
-
-
 
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(this);
@@ -88,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements
       new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
 
     } else if (FAVORITES.equals(value)) {
-      Cursor cursor = getAllFavorites();
-      adapter = new RecyclerViewAdapter(this, cursor.getCount());
-      recyclerView.setAdapter(adapter);
+      cursorAdapter = new CustomCursorAdapter(this);
+      recyclerView.setAdapter(cursorAdapter);
+      getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
+
+
     }
   }
 
@@ -144,16 +150,63 @@ public class MainActivity extends AppCompatActivity implements
     SETTINGS_CHANGED = true;
   }
 
-  public Cursor getAllFavorites() {
-    return mDb.query(
-        FavoritesContract.FavoritesEntry.TABLE_NAME,
-        null,
-        null,
-        null,
-        null,
-        null,
-        FavoritesEntry.COLUMN_MOVIE_TITLE
-    );
+
+  @Override
+  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    return new AsyncTaskLoader<Cursor>(this) {
+
+      // Initialize a Cursor, this will hold all the task data
+      Cursor mTaskData = null;
+
+      // onStartLoading() is called when a loader first starts loading data
+      @Override
+      protected void onStartLoading() {
+        if (mTaskData != null) {
+          // Delivers any previously loaded data immediately
+          deliverResult(mTaskData);
+        } else {
+          // Force a new load
+          forceLoad();
+        }
+      }
+
+      // loadInBackground() performs asynchronous loading of data
+      @Override
+      public Cursor loadInBackground() {
+        // Will implement to load data
+
+        try {
+          return getContentResolver().query(FavoritesContract.FavoritesEntry.CONTENT_URI,
+              null,
+              null,
+              null,
+              FavoritesContract.FavoritesEntry.COLUMN_MOVIE_TITLE);
+
+        } catch (Exception e) {
+          System.out.println("Failed to asynchronously load data.");
+          System.out.println(e.getMessage());
+          return null;
+        }
+      }
+
+      // deliverResult sends the result of the load, a Cursor, to the registered listener
+      public void deliverResult(Cursor data) {
+        mTaskData = data;
+        super.deliverResult(data);
+      }
+    };
+  }
+
+  @Override
+  public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    cursorAdapter.swapCursor(data);
+  }
+
+  @Override
+  public void onLoaderReset(Loader<Cursor> loader) {
+
+    cursorAdapter.swapCursor(null);
   }
 
   public class FetchMoviesTaskListener implements AsyncTaskListener<List<Movie>> {

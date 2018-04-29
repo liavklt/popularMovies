@@ -1,7 +1,8 @@
 package com.example.android.popularmoviesstageone;
 
+import android.content.ContentValues;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.android.popularmoviesstageone.data.FavoritesContract;
+import com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry;
 import com.example.android.popularmoviesstageone.model.Movie;
 import com.example.android.popularmoviesstageone.model.Video;
 import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
@@ -38,7 +41,7 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
   private LinearLayoutManager linearLayoutManager;
   private TrailerRecyclerViewAdapter adapter;
   private RecyclerView reviewRecyclerView;
-  private Button favoritesButton;
+  private ImageButton favoritesButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +83,6 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
 
     ReviewsFragment reviewsFragment = new ReviewsFragment();
     reviewsFragment.initializeRecyclerView(reviewRecyclerView, movie);
-
-
 
 
   }
@@ -135,12 +136,35 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
   public void onClick(View v) {
     int id = v.getId();
     if (id == R.id.button_favorite) {
-      //TODO check if already filled or not
-      Toast.makeText(this, "Pressed it! Yay!", Toast.LENGTH_SHORT).show();
-      Drawable top = getResources().getDrawable(R.drawable.ic_star_black_24dp);
-      favoritesButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+      if (favoritesButton.getBackground().getConstantState() == getResources()
+          .getDrawable(R.drawable.ic_star_black_24dp).getConstantState()) {
+        favoritesButton.setBackgroundResource(R.drawable.ic_star_border_black_24dp);
+        //TODO delete entry
+      } else {
+        favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
+        addFavorite();
+      }
 
     }
+  }
+
+  private void addFavorite() {
+    ContentValues contentValues = new ContentValues();
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_ID, movie.getId());
+    contentValues
+        .put(FavoritesEntry.COLUMN_MOVIE_TITLE, originalTitleTextView.getText().toString());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_RATING, userRatingTextView.getText().toString());
+    contentValues
+        .put(FavoritesEntry.COLUMN_MOVIE_RELEASE_DATE, releaseDateTextView.getText().toString());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_SYNOPSIS, plotTextView.getText().toString());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_POSTER, movie.getPosterUrl());
+
+    Uri uri = getContentResolver()
+        .insert(FavoritesContract.FavoritesEntry.CONTENT_URI, contentValues);
+    if (uri != null) {
+      Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+    }
+
   }
 
   public class FetchTrailersTaskListener implements AsyncTaskListener<List<Video>> {
