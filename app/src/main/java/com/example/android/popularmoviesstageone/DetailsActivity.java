@@ -1,5 +1,7 @@
 package com.example.android.popularmoviesstageone;
 
+import static com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID;
+
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,14 +31,12 @@ import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity implements OnClickListener {
 
-  private static final int TASK_LOADER_ID = 0;
   private ImageView backdropImageView;
   private ImageView posterImageView;
   private TextView originalTitleTextView;
   private TextView userRatingTextView;
   private TextView releaseDateTextView;
   private TextView plotTextView;
-  private TextView videosTextView;
   private Movie movie;
   private RecyclerView trailerRecyclerView;
   private LinearLayoutManager linearLayoutManager;
@@ -115,6 +115,9 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
     userRatingTextView.setText(userRatingString);
     releaseDateTextView.setText(movie.getReleaseDate());
     plotTextView.setText(movie.getPlot());
+    if (isFavorite(movie.getId())) {
+      favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
+    }
   }
 
   private void loadImage(String posterSize, String posterPath, ImageView imageView) {
@@ -139,25 +142,28 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
     if (id == R.id.button_favorite) {
       if (favoritesButton.getBackground().getConstantState() == getResources()
           .getDrawable(R.drawable.ic_star_black_24dp).getConstantState()) {
-        favoritesButton.setBackgroundResource(R.drawable.ic_star_border_black_24dp);
-        deleteFavorite(movie.getId().intValue());
+        if (deleteFavorite(movie.getId().intValue()) != 0) {
+          favoritesButton.setBackgroundResource(R.drawable.ic_star_border_black_24dp);
+        }
       } else {
-        favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
-        addFavorite();
+        if (addFavorite()) {
+          favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
+        }
       }
 
     }
   }
 
-  private void deleteFavorite(int id) {
+  private int deleteFavorite(int id) {
     Uri uri = FavoritesEntry.CONTENT_URI;
     uri = uri.buildUpon().appendPath(Integer.toString(id)).build();
-    getContentResolver().delete(uri, null, null);
+
+    return getContentResolver().delete(uri, null, null);
 //    getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
 
   }
 
-  private void addFavorite() {
+  private boolean addFavorite() {
     ContentValues contentValues = new ContentValues();
     contentValues.put(FavoritesEntry.COLUMN_MOVIE_ID, movie.getId());
     contentValues
@@ -172,10 +178,17 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
         .insert(FavoritesContract.FavoritesEntry.CONTENT_URI, contentValues);
     if (uri != null) {
       Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+      return true;
     } else {
       Toast.makeText(getBaseContext(), "Already exists!", Toast.LENGTH_SHORT).show();
     }
+    return false;
 
+  }
+
+  public boolean isFavorite(Long id) {
+    return (getContentResolver().query(FavoritesEntry.CONTENT_URI, null, COLUMN_MOVIE_ID + "=?",
+        new String[]{id.toString()}, null)).getCount() != 0;
   }
 
   public class FetchTrailersTaskListener implements AsyncTaskListener<List<Video>> {
