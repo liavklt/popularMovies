@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesstageone.data;
 
+import static com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID;
 import static com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry.TABLE_NAME;
 
 import android.content.ContentProvider;
@@ -83,7 +84,14 @@ public class FavoritesContentProvider extends ContentProvider {
     final SQLiteDatabase db = favoritesDbHelper.getWritableDatabase();
     int match = uriMatcher.match(uri);
     Uri returnUri; // URI to be returned
+    String s = values.get(COLUMN_MOVIE_ID).toString();
+    Cursor queryCursor = db
+        .query(TABLE_NAME, null, COLUMN_MOVIE_ID + "=?", new String[]{s}, null, null, null);
+    if (queryCursor.getCount() != 0) {
+      queryCursor.close();
 
+      return null;
+    }
     switch (match) {
       case FAVORITES:
         long id = db.insert(TABLE_NAME, null, values);
@@ -106,7 +114,24 @@ public class FavoritesContentProvider extends ContentProvider {
   @Override
   public int delete(@NonNull Uri uri, @Nullable String selection,
       @Nullable String[] selectionArgs) {
-    throw new UnsupportedOperationException("Not yet implemented");
+
+    final SQLiteDatabase db = favoritesDbHelper.getWritableDatabase();
+    int match = uriMatcher.match(uri);
+    int favsDeleted;
+
+    switch (match) {
+      case FAVORITE_WITH_ID:
+        String id = uri.getPathSegments().get(1);
+        favsDeleted = db.delete(TABLE_NAME, COLUMN_MOVIE_ID + "=?", new String[]{id});
+        break;
+      default:
+        throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
+    if (favsDeleted != 0) {
+      getContext().getContentResolver().notifyChange(uri, null);
+    }
+    return favsDeleted;
+
   }
 
   @Override

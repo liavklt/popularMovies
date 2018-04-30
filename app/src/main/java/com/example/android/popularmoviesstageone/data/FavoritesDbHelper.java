@@ -12,7 +12,7 @@ import com.example.android.popularmoviesstageone.data.FavoritesContract.Favorite
 public class FavoritesDbHelper extends SQLiteOpenHelper {
 
   private static final String DATABASE_NAME = "favorites.db";
-  private static final int DATABASE_VERSION = 1;
+  private static final int DATABASE_VERSION = 2;
 
   public FavoritesDbHelper(Context context) {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -21,8 +21,7 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
   @Override
   public void onCreate(SQLiteDatabase db) {
     final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + " (" +
-        FavoritesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-        FavoritesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+        FavoritesEntry.COLUMN_MOVIE_ID + " INTEGER PRIMARY KEY NOT NULL, " +
         FavoritesEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
         FavoritesEntry.COLUMN_MOVIE_SYNOPSIS + " TEXT, " +
         FavoritesEntry.COLUMN_MOVIE_POSTER + " TEXT, " +

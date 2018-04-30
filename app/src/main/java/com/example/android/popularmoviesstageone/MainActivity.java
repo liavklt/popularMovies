@@ -143,7 +143,13 @@ public class MainActivity extends AppCompatActivity implements
     } else if (index != -1) {
       gridLayoutManager.scrollToPositionWithOffset(index, top);
     }
-    getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
+    SharedPreferences sharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
+
+    if (FAVORITES.equals(value)) {
+      getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
+    }
   }
 
   @Override

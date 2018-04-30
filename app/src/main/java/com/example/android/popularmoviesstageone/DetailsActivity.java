@@ -29,6 +29,7 @@ import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity implements OnClickListener {
 
+  private static final int TASK_LOADER_ID = 0;
   private ImageView backdropImageView;
   private ImageView posterImageView;
   private TextView originalTitleTextView;
@@ -139,13 +140,21 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
       if (favoritesButton.getBackground().getConstantState() == getResources()
           .getDrawable(R.drawable.ic_star_black_24dp).getConstantState()) {
         favoritesButton.setBackgroundResource(R.drawable.ic_star_border_black_24dp);
-        //TODO delete entry
+        deleteFavorite(movie.getId().intValue());
       } else {
         favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
         addFavorite();
       }
 
     }
+  }
+
+  private void deleteFavorite(int id) {
+    Uri uri = FavoritesEntry.CONTENT_URI;
+    uri = uri.buildUpon().appendPath(Integer.toString(id)).build();
+    getContentResolver().delete(uri, null, null);
+//    getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
   }
 
   private void addFavorite() {
@@ -163,6 +172,8 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
         .insert(FavoritesContract.FavoritesEntry.CONTENT_URI, contentValues);
     if (uri != null) {
       Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+    } else {
+      Toast.makeText(getBaseContext(), "Already exists!", Toast.LENGTH_SHORT).show();
     }
 
   }
