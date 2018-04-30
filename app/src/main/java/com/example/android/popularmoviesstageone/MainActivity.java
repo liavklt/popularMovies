@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements
     } else if (index != -1) {
       gridLayoutManager.scrollToPositionWithOffset(index, top);
     }
+    getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
   }
 
   @Override

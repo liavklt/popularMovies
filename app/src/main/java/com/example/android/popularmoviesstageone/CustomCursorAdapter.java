@@ -39,7 +39,6 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
     int idIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_ID);
     int posterIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_POSTER);
     mCursor.moveToPosition(position);
-    final int id = mCursor.getInt(idIndex);
     String posterUrl =
         mContext.getString(R.string.image_base_url) + mContext.getString(R.string.poster_size)
             + mCursor.getString(posterIndex);
@@ -52,7 +51,6 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
     if (mCursor == null) {
       return 0;
     }
-    int count = mCursor.getCount();
     return mCursor.getCount();
   }
 
