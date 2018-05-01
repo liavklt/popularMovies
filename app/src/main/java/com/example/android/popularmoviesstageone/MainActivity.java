@@ -77,15 +77,17 @@ public class MainActivity extends AppCompatActivity implements
   private void loadMoviePosters() {
     SharedPreferences sharedPreferences = PreferenceManager
         .getDefaultSharedPreferences(this);
-    String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
+    String value = sharedPreferences
+        .getString(getString(R.string.sort_order_key), getString(R.string.sort_default));
     URL moviePosterUrl = null;
     if (TOP_RATED.equals(value)) {
       moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
       adapter = new RecyclerViewAdapter(this);
       recyclerView.setAdapter(adapter);
       new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
-
-    } else if (POPULAR.equals(value)) {
+//maybe second or argument is not needed! TODO check!
+    } else if (POPULAR.equals(value) || getString(R.string.pref_order_label_popular)
+        .equals(value)) {
       moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
       adapter = new RecyclerViewAdapter(this);
       recyclerView.setAdapter(adapter);
