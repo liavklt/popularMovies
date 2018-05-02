@@ -173,6 +173,7 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
         .put(FavoritesEntry.COLUMN_MOVIE_RELEASE_DATE, releaseDateTextView.getText().toString());
     contentValues.put(FavoritesEntry.COLUMN_MOVIE_SYNOPSIS, plotTextView.getText().toString());
     contentValues.put(FavoritesEntry.COLUMN_MOVIE_POSTER, movie.getPosterUrl());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_BACKDROP_IMAGE, movie.getBackdropPathUrl());
 
     Uri uri = getContentResolver()
         .insert(FavoritesContract.FavoritesEntry.CONTENT_URI, contentValues);

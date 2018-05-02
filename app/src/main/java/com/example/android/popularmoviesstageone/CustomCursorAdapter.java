@@ -99,6 +99,7 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
       int idIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_ID);
       int ratingIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_RATING);
       int releaseDateIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_RELEASE_DATE);
+      int backdropImageIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_BACKDROP_IMAGE);
 
       movie.setPosterUrl(mCursor.getString(posterIndex));
       movie.setOriginalTitle(mCursor.getString(originalTitleIndex));
@@ -106,6 +107,7 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
       movie.setReleaseDate(mCursor.getString(releaseDateIndex));
       movie.setId(mCursor.getLong(idIndex));
       movie.setUserRating(mCursor.getDouble(ratingIndex));
+      movie.setBackdropPathUrl(mCursor.getString(backdropImageIndex));
 
       return movie;
     }

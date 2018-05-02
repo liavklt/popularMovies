@@ -25,5 +25,6 @@ public class FavoritesContract {
     public static final String COLUMN_MOVIE_POSTER = "poster";
     public static final String COLUMN_MOVIE_RATING = "rating";
     public static final String COLUMN_MOVIE_RELEASE_DATE = "releaseDate";
+    public static final String COLUMN_MOVIE_BACKDROP_IMAGE = "backdropPathUrl";
   }
 }

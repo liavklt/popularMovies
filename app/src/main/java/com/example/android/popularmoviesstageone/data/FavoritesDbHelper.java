@@ -12,7 +12,7 @@ import com.example.android.popularmoviesstageone.data.FavoritesContract.Favorite
 public class FavoritesDbHelper extends SQLiteOpenHelper {
 
   private static final String DATABASE_NAME = "favorites.db";
-  private static final int DATABASE_VERSION = 2;
+  private static final int DATABASE_VERSION = 6;
 
   public FavoritesDbHelper(Context context) {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,14 +26,17 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
         FavoritesEntry.COLUMN_MOVIE_SYNOPSIS + " TEXT, " +
         FavoritesEntry.COLUMN_MOVIE_POSTER + " TEXT, " +
         FavoritesEntry.COLUMN_MOVIE_RATING + " REAL, " +
-        FavoritesEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT" +
+        FavoritesEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT, " +
+        FavoritesEntry.COLUMN_MOVIE_BACKDROP_IMAGE + " TEXT" +
         "); ";
     db.execSQL(SQL_CREATE_FAVORITES_TABLE);
   }
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS " + FavoritesEntry.TABLE_NAME);
+    final String SQL_DROP_TABLE_IF_EXISTS =
+        "DROP TABLE IF EXISTS " + FavoritesEntry.TABLE_NAME + ";";
+    db.execSQL(SQL_DROP_TABLE_IF_EXISTS);
     onCreate(db);
   }
 }
