@@ -82,13 +82,15 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
 
     }
 
+
     @Override
     public void onClick(View v) {
       Intent detailsActivityIntent = new Intent(v.getContext(), DetailsActivity.class);
-
+      mCursor.moveToPosition(this.getAdapterPosition());
       Movie movie = setMovieInformationFromDb();
       detailsActivityIntent.putExtra("movie", movie);
       v.getContext().startActivity(detailsActivityIntent);
+
     }
 
     private Movie setMovieInformationFromDb() {

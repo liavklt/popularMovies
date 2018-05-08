@@ -37,6 +37,8 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
   private TextView userRatingTextView;
   private TextView releaseDateTextView;
   private TextView plotTextView;
+  private TextView trailersTextView;
+  private TextView reviewsTextView;
   private Movie movie;
   private RecyclerView trailerRecyclerView;
   private LinearLayoutManager linearLayoutManager;
@@ -61,6 +63,8 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
     userRatingTextView = findViewById(R.id.user_rating);
     releaseDateTextView = findViewById(R.id.release_date);
     plotTextView = findViewById(R.id.plot);
+    trailersTextView = findViewById(R.id.trailer_text);
+    reviewsTextView = findViewById(R.id.reviews_text);
     favoritesButton = findViewById(R.id.button_favorite);
     favoritesButton.setOnClickListener(this);
 
@@ -75,15 +79,20 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
     adapter = new TrailerRecyclerViewAdapter(this);
     trailerRecyclerView.setAdapter(adapter);
 
+    reviewRecyclerView = findViewById(R.id.rv_reviews);
+    ReviewsFragment reviewsFragment = new ReviewsFragment();
+
     if (NetworkUtils.isConnected(this)) {
       loadTrailers(movie);
+      reviewsFragment.initializeRecyclerView(reviewRecyclerView, movie);
     } else {
-      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
-    }
-    reviewRecyclerView = findViewById(R.id.rv_reviews);
+      trailersTextView.setVisibility(View.GONE);
+      reviewsTextView.setVisibility(View.GONE);
 
-    ReviewsFragment reviewsFragment = new ReviewsFragment();
-    reviewsFragment.initializeRecyclerView(reviewRecyclerView, movie);
+      Toast.makeText(this, "No connection to load trailers and reviews. Try again later.",
+          Toast.LENGTH_SHORT).show();
+    }
+
 
 
   }

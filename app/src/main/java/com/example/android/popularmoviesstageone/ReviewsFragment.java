@@ -2,6 +2,7 @@ package com.example.android.popularmoviesstageone;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ public class ReviewsFragment extends Fragment {
   private LinearLayoutManager linearLayoutManager;
   private ReviewRecyclerViewAdapter reviewRecyclerViewAdapter;
   private RecyclerView reviewRecyclerView;
+  private FragmentActivity mActivity;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,

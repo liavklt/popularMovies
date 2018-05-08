@@ -67,12 +67,12 @@ public class MainActivity extends AppCompatActivity implements
         .registerOnSharedPreferenceChangeListener(this);
     FavoritesDbHelper favoritesDbHelper = new FavoritesDbHelper(this);
     mDb = favoritesDbHelper.getWritableDatabase();
+    adapter = new RecyclerViewAdapter(this);
 
-    if (NetworkUtils.isConnected(this)) {
-      loadMoviePosters();
-    } else {
-      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
-    }
+    cursorAdapter = new CustomCursorAdapter(this);
+
+    loadMoviePosters();
+
   }
 
 
@@ -82,25 +82,25 @@ public class MainActivity extends AppCompatActivity implements
     String value = sharedPreferences
         .getString(getString(R.string.sort_order_key), getString(R.string.sort_default));
     URL moviePosterUrl = null;
-    if (TOP_RATED.equals(value)) {
-      moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
-      adapter = new RecyclerViewAdapter(this);
-      recyclerView.setAdapter(adapter);
-      new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
-//maybe second or argument is not needed! TODO check!
-    } else if (POPULAR.equals(value) || getString(R.string.pref_order_label_popular)
-        .equals(value)) {
-      moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
-      adapter = new RecyclerViewAdapter(this);
-      recyclerView.setAdapter(adapter);
-      new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
-
-    } else if (FAVORITES.equals(value)) {
-      cursorAdapter = new CustomCursorAdapter(this);
+    if (FAVORITES.equals(value)) {
       recyclerView.setAdapter(cursorAdapter);
       getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
+    } else if (NetworkUtils.isConnected(this)) {
 
+      if (TOP_RATED.equals(value)) {
+        moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
+        recyclerView.setAdapter(adapter);
+        new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
+//maybe second or argument is not needed! TODO check!
+      } else if (POPULAR.equals(value) || getString(R.string.pref_order_label_popular)
+          .equals(value)) {
+        moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
+        recyclerView.setAdapter(adapter);
+        new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
 
+      }
+    } else {
+      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
     }
 
   }
