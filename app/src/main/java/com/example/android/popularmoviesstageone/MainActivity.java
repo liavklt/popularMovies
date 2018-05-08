@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements
   private static final String POPULAR = "/movie/popular";
   private static final String TOP_RATED = "/movie/top_rated";
   private static final String FAVORITES = "favorites";
+  private static final String INDEX_KEY = "index";
+  private static final String TOP_KEY = "top";
   private static int index = -1;
   private static int top = -1;
   private static boolean SETTINGS_CHANGED = false;
@@ -100,14 +102,27 @@ public class MainActivity extends AppCompatActivity implements
 
 
     }
+
   }
 
   @Override
-  protected void onPause() {
-    super.onPause();
-    index = gridLayoutManager.findFirstVisibleItemPosition();
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    super.onRestoreInstanceState(savedInstanceState);
+    index = savedInstanceState.getInt(INDEX_KEY);
+    top = savedInstanceState.getInt(TOP_KEY);
+
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    outState.putInt(INDEX_KEY, gridLayoutManager.findFirstVisibleItemPosition());
     View v = recyclerView.getChildAt(0);
     top = (v == null) ? 0 : (v.getTop() - recyclerView.getPaddingTop());
+
+    outState.putInt(TOP_KEY, top);
+
+    super.onSaveInstanceState(outState);
+
   }
 
   @Override
@@ -136,14 +151,21 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   @Override
+  protected void onPause() {
+    super.onPause();
+    index = gridLayoutManager.findFirstVisibleItemPosition();
+    View v = recyclerView.getChildAt(0);
+    top = (v == null) ? 0 : (v.getTop() - recyclerView.getPaddingTop());
+
+  }
+
+  @Override
   protected void onResume() {
     super.onResume();
     if (SETTINGS_CHANGED) {
       loadMoviePosters();
       gridLayoutManager.scrollToPosition(0);
       SETTINGS_CHANGED = false;
-    } else if (index != -1) {
-      gridLayoutManager.scrollToPositionWithOffset(index, top);
     }
     SharedPreferences sharedPreferences = PreferenceManager
         .getDefaultSharedPreferences(this);
@@ -247,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         adapter.setMovieData(movies);
         adapter.notifyDataSetChanged();
+        gridLayoutManager.scrollToPositionWithOffset(index, top);
       }
     }
   }
