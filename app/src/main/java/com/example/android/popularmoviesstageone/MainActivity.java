@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
         .getDefaultSharedPreferences(this);
     String value = sharedPreferences
         .getString(getString(R.string.sort_order_key), getString(R.string.sort_default));
-    URL moviePosterUrl = null;
+    URL moviePosterUrl;
     if (FAVORITES.equals(value)) {
       recyclerView.setAdapter(cursorAdapter);
       getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);

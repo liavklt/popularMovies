@@ -83,9 +83,9 @@ public class FavoritesContentProvider extends ContentProvider {
     final SQLiteDatabase db = favoritesDbHelper.getWritableDatabase();
     int match = uriMatcher.match(uri);
     Uri returnUri; // URI to be returned
-    String s = values.get(COLUMN_MOVIE_ID).toString();
+    String movieId = values != null ? values.get(COLUMN_MOVIE_ID).toString() : null;
     Cursor queryCursor = db
-        .query(TABLE_NAME, null, COLUMN_MOVIE_ID + "=?", new String[]{s}, null, null, null);
+        .query(TABLE_NAME, null, COLUMN_MOVIE_ID + "=?", new String[]{movieId}, null, null, null);
     if (queryCursor.getCount() != 0) {
       queryCursor.close();
 

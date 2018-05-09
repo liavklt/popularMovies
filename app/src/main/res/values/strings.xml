@@ -26,6 +26,9 @@
   <string name="releaseDateTitle">Release Date: </string>
   <string name="userRatingTitle">User Rating: </string>
   <string name="plotSynopsisTitle">Plot Synopsis: </string>
+  <string name="trailersTitle">Trailers: </string>
+  <string name="reviewsTitle">Reviews: </string>
+  <string name="readMoreText">Read more…</string>
 
 
 </resources>
