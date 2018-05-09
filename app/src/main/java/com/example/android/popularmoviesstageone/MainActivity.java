@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements
     String value = sharedPreferences
         .getString(getString(R.string.sort_order_key), getString(R.string.sort_default));
     URL moviePosterUrl;
+    recyclerView.setVisibility(View.VISIBLE);
+
     if (FAVORITES.equals(value)) {
       recyclerView.setAdapter(cursorAdapter);
       getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
@@ -94,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements
 
       }
     } else {
-      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
+      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_LONG).show();
+      recyclerView.setVisibility(View.INVISIBLE);
     }
 
   }
