@@ -27,6 +27,9 @@ public class NetworkUtils {
   private final static String API_KEY_PARAM = "api_key";
   private final static String LANGUAGE_PARAM = "language";
 
+  private final static int CONNECT_TIMEOUT = 5000;
+  private final static int READ_TIMEOUT = 10000;
+
   public static URL buildUrl(String param) {
     String apiKey = BuildConfig.API_KEY;
 
@@ -50,6 +53,8 @@ public class NetworkUtils {
   public static String getResponseFromHttpUrl(URL url) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
     try {
+      urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+      urlConnection.setReadTimeout(READ_TIMEOUT);
       InputStream in = urlConnection.getInputStream();
 
       Scanner scanner = new Scanner(in);
