@@ -40,13 +40,10 @@ class ReviewRecyclerViewAdapter extends
   @Override
   public void onBindViewHolder(ViewHolder holder, int position) {
     String reviewContent = reviews.get(position).getContent();
-    String author = reviews.get(position).getAuthor();
     String url = reviews.get(position).getUrl();
 
-//    holder.authorTextView.setText(author);
     holder.contentTextView.setText(reviewContent);
     holder.expandButton.setTag(R.id.reviewURI, url);
-//    holder.urlTextView.setTag(R.id.reviewURI,url);
 
   }
 
@@ -65,15 +62,11 @@ class ReviewRecyclerViewAdapter extends
   class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     TextView contentTextView;
-    //    TextView authorTextView;
-//    TextView urlTextView;
     Button expandButton;
 
     public ViewHolder(View itemView) {
       super(itemView);
       contentTextView = itemView.findViewById(R.id.tv_review_content);
-//      authorTextView = itemView.findViewById(R.id.tv_review_author);
-//      urlTextView = itemView.findViewById(R.id.tv_review_url);
       expandButton = itemView.findViewById(R.id.button_expand);
       expandButton.setOnClickListener(this);
 

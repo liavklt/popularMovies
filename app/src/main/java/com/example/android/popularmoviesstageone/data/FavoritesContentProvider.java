@@ -27,7 +27,6 @@ public class FavoritesContentProvider extends ContentProvider {
 
   public static UriMatcher buildUriMatcher() {
 
-    // Initialize a UriMatcher with no matches by passing in NO_MATCH to the constructor
     UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     uriMatcher.addURI(FavoritesContract.AUTHORITY, FavoritesContract.PATH_FAVORITES, FAVORITES);

@@ -3,7 +3,6 @@ package com.example.android.popularmoviesstageone;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -46,8 +45,6 @@ public class MainActivity extends AppCompatActivity implements
   private RecyclerViewAdapter adapter;
   private CustomCursorAdapter cursorAdapter;
   private ProgressBar mLoadingIndicator;
-  private SQLiteDatabase mDb;
-
   private GridLayoutManager gridLayoutManager;
 
   @Override
@@ -66,9 +63,7 @@ public class MainActivity extends AppCompatActivity implements
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(this);
     FavoritesDbHelper favoritesDbHelper = new FavoritesDbHelper(this);
-    mDb = favoritesDbHelper.getWritableDatabase();
     adapter = new RecyclerViewAdapter(this);
-
     cursorAdapter = new CustomCursorAdapter(this);
 
     loadMoviePosters();
@@ -91,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements
         moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
         recyclerView.setAdapter(adapter);
         new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
-//maybe second or argument is not needed! TODO check!
       } else if (POPULAR.equals(value) || getString(R.string.pref_order_label_popular)
           .equals(value)) {
         moviePosterUrl = NetworkUtils.buildUrl(POPULAR);

@@ -38,7 +38,6 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
 
   @Override
   public void onBindViewHolder(CustomCursorAdapter.FavoritesViewHolder holder, int position) {
-    int idIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_ID);
     int posterIndex = mCursor.getColumnIndex(FavoritesEntry.COLUMN_MOVIE_POSTER);
     mCursor.moveToPosition(position);
     String posterUrl =
@@ -78,10 +77,7 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
       super(itemView);
       listMovieItemView = itemView.findViewById(R.id.iv_movie_item);
       listMovieItemView.setOnClickListener(this);
-
-
     }
-
 
     @Override
     public void onClick(View v) {
@@ -90,7 +86,6 @@ class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapter.Favor
       Movie movie = setMovieInformationFromDb();
       detailsActivityIntent.putExtra("movie", movie);
       v.getContext().startActivity(detailsActivityIntent);
-
     }
 
     private Movie setMovieInformationFromDb() {

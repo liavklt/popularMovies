@@ -168,8 +168,6 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
     uri = uri.buildUpon().appendPath(Integer.toString(id)).build();
 
     return getContentResolver().delete(uri, null, null);
-//    getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
-
   }
 
   private boolean addFavorite() {
