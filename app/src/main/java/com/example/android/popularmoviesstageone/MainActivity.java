@@ -159,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements
     if (SETTINGS_CHANGED) {
       loadMoviePosters();
       gridLayoutManager.scrollToPosition(0);
+      index = -1; //scroll position to the beginning
+      top = -1;
       SETTINGS_CHANGED = false;
     }
     SharedPreferences sharedPreferences = PreferenceManager
