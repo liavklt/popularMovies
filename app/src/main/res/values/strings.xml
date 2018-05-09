@@ -1,13 +1,15 @@
 <resources>
-  <string name="app_name">Popular Movies, Stage1</string>
+  <string name="app_name">Popular Movies, Stage2</string>
   <string name="action_settings">Settings</string>
-  <string name="sort_default">Popular</string>
+  <string name="sort_default">/movie/popular</string>
   <string name="sort_order_key">order</string>
   <string name="sort_order_label">Sort Order</string>
   <string name="pref_order_label_popular">Popular</string>
   <string name="pref_order_label_toprated">Top Rated</string>
+  <string name="pref_order_label_favorites">Favorites</string>
   <string name="pref_order_popular">/movie/popular</string>
   <string name="pref_order_toprated">/movie/top_rated</string>
+  <string name="pref_order_favorites">favorites</string>
 
   <string name="backdrop_size">w500</string>
   <string name="poster_size">w185</string>
@@ -24,6 +26,9 @@
   <string name="releaseDateTitle">Release Date: </string>
   <string name="userRatingTitle">User Rating: </string>
   <string name="plotSynopsisTitle">Plot Synopsis: </string>
+  <string name="trailersTitle">Trailers: </string>
+  <string name="reviewsTitle">Reviews: </string>
+  <string name="readMoreText">Read more…</string>
 
 
 </resources>

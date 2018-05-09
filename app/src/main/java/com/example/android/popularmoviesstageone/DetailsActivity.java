@@ -1,17 +1,35 @@
 package com.example.android.popularmoviesstageone;
 
+import static com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID;
+
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.android.popularmoviesstageone.data.FavoritesContract;
+import com.example.android.popularmoviesstageone.data.FavoritesContract.FavoritesEntry;
 import com.example.android.popularmoviesstageone.model.Movie;
+import com.example.android.popularmoviesstageone.model.Video;
+import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
+import com.example.android.popularmoviesstageone.utils.FetchTrailersAsyncTask;
+import com.example.android.popularmoviesstageone.utils.JsonUtils;
+import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import com.squareup.picasso.Picasso;
+import java.net.URL;
+import java.util.List;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements OnClickListener {
 
   private ImageView backdropImageView;
   private ImageView posterImageView;
@@ -19,7 +37,14 @@ public class DetailsActivity extends AppCompatActivity {
   private TextView userRatingTextView;
   private TextView releaseDateTextView;
   private TextView plotTextView;
+  private TextView trailersTextView;
+  private TextView reviewsTextView;
   private Movie movie;
+  private RecyclerView trailerRecyclerView;
+  private LinearLayoutManager linearLayoutManager;
+  private TrailerRecyclerViewAdapter adapter;
+  private RecyclerView reviewRecyclerView;
+  private ImageButton favoritesButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +63,49 @@ public class DetailsActivity extends AppCompatActivity {
     userRatingTextView = findViewById(R.id.user_rating);
     releaseDateTextView = findViewById(R.id.release_date);
     plotTextView = findViewById(R.id.plot);
+    trailersTextView = findViewById(R.id.trailer_text);
+    reviewsTextView = findViewById(R.id.reviews_text);
+    favoritesButton = findViewById(R.id.button_favorite);
+    favoritesButton.setOnClickListener(this);
 
     populateUI();
+
+    trailerRecyclerView = findViewById(R.id.rv_trailers);
+    trailerRecyclerView.setHasFixedSize(true);
+
+    linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    trailerRecyclerView.setLayoutManager(linearLayoutManager);
+
+    adapter = new TrailerRecyclerViewAdapter(this);
+    trailerRecyclerView.setAdapter(adapter);
+
+    reviewRecyclerView = findViewById(R.id.rv_reviews);
+    ReviewsFragment reviewsFragment = new ReviewsFragment();
+
+    if (NetworkUtils.isConnected(this)) {
+      loadTrailers(movie);
+      reviewsFragment.initializeRecyclerView(reviewRecyclerView, movie);
+    } else {
+      trailersTextView.setVisibility(View.GONE);
+      reviewsTextView.setVisibility(View.GONE);
+
+      Toast.makeText(this, "No connection to load trailers and reviews. Try again later.",
+          Toast.LENGTH_SHORT).show();
+    }
+
+
+
   }
+
+  private void loadTrailers(Movie movie) {
+    Long id = movie.getId();
+    URL videosUrl;
+    String getVideosUrl = "/movie/" + id.toString() + "/videos";
+    videosUrl = NetworkUtils.buildUrl(getVideosUrl);
+
+    new FetchTrailersAsyncTask(this, new FetchTrailersTaskListener()).execute(videosUrl);
+  }
+
 
   private void closeOnError() {
     finish();
@@ -59,6 +124,9 @@ public class DetailsActivity extends AppCompatActivity {
     userRatingTextView.setText(userRatingString);
     releaseDateTextView.setText(movie.getReleaseDate());
     plotTextView.setText(movie.getPlot());
+    if (isFavorite(movie.getId())) {
+      favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
+    }
   }
 
   private void loadImage(String posterSize, String posterPath, ImageView imageView) {
@@ -77,5 +145,87 @@ public class DetailsActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
+  @Override
+  public void onClick(View v) {
+    int id = v.getId();
+    if (id == R.id.button_favorite) {
+      if (favoritesButton.getBackground().getConstantState() == getResources()
+          .getDrawable(R.drawable.ic_star_black_24dp).getConstantState()) {
+        if (deleteFavorite(movie.getId().intValue()) != 0) {
+          favoritesButton.setBackgroundResource(R.drawable.ic_star_border_black_24dp);
+        }
+      } else {
+        if (addFavorite()) {
+          favoritesButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
+        }
+      }
 
+    }
+  }
+
+  private int deleteFavorite(int id) {
+    Uri uri = FavoritesEntry.CONTENT_URI;
+    uri = uri.buildUpon().appendPath(Integer.toString(id)).build();
+
+    return getContentResolver().delete(uri, null, null);
+  }
+
+  private boolean addFavorite() {
+    ContentValues contentValues = new ContentValues();
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_ID, movie.getId());
+    contentValues
+        .put(FavoritesEntry.COLUMN_MOVIE_TITLE, originalTitleTextView.getText().toString());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_RATING, userRatingTextView.getText().toString());
+    contentValues
+        .put(FavoritesEntry.COLUMN_MOVIE_RELEASE_DATE, releaseDateTextView.getText().toString());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_SYNOPSIS, plotTextView.getText().toString());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_POSTER, movie.getPosterUrl());
+    contentValues.put(FavoritesEntry.COLUMN_MOVIE_BACKDROP_IMAGE, movie.getBackdropPathUrl());
+
+    Uri uri = getContentResolver()
+        .insert(FavoritesContract.FavoritesEntry.CONTENT_URI, contentValues);
+    if (uri != null) {
+      Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+      return true;
+    } else {
+      Toast.makeText(getBaseContext(), "Already exists!", Toast.LENGTH_SHORT).show();
+    }
+    return false;
+
+  }
+
+  public boolean isFavorite(Long id) {
+    return (getContentResolver().query(FavoritesEntry.CONTENT_URI, null, COLUMN_MOVIE_ID + "=?",
+        new String[]{id.toString()}, null)).getCount() != 0;
+  }
+
+  public class FetchTrailersTaskListener implements AsyncTaskListener<List<Video>> {
+
+    @Override
+    public void onTaskPreExecute() {
+    }
+
+    @Override
+    public List<Video> onTaskGetResult(URL url) {
+      String jsonString;
+      List<Video> trailers;
+      try {
+        jsonString = NetworkUtils.getResponseFromHttpUrl(url);
+        trailers = JsonUtils.getVideosFromJson(jsonString);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+      }
+      return trailers;
+    }
+
+    @Override
+    public void onTaskComplete(List<Video> videos) {
+      if (videos != null) {
+        trailerRecyclerView.setVisibility(View.VISIBLE);
+        adapter.setVideoData(videos);
+        adapter.notifyDataSetChanged();
+      }
+    }
+  }
 }

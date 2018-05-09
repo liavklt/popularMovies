@@ -2,8 +2,11 @@ package com.example.android.popularmoviesstageone;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,22 +16,34 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+import com.example.android.popularmoviesstageone.data.FavoritesContract;
+import com.example.android.popularmoviesstageone.data.FavoritesDbHelper;
 import com.example.android.popularmoviesstageone.model.Movie;
+import com.example.android.popularmoviesstageone.utils.AsyncTaskListener;
+import com.example.android.popularmoviesstageone.utils.FetchMoviesAsyncTask;
 import com.example.android.popularmoviesstageone.utils.JsonUtils;
 import com.example.android.popularmoviesstageone.utils.NetworkUtils;
 import java.net.URL;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-    SharedPreferences.OnSharedPreferenceChangeListener {
+    SharedPreferences.OnSharedPreferenceChangeListener, LoaderManager.LoaderCallbacks<Cursor> {
+
+  private final static String TAG = MainActivity.class.getSimpleName();
+  private static final int TASK_LOADER_ID = 0;
 
   private static final String POPULAR = "/movie/popular";
   private static final String TOP_RATED = "/movie/top_rated";
+  private static final String FAVORITES = "favorites";
+  private static final String INDEX_KEY = "index";
+  private static final String TOP_KEY = "top";
   private static int index = -1;
   private static int top = -1;
   private static boolean SETTINGS_CHANGED = false;
   private RecyclerView recyclerView;
   private RecyclerViewAdapter adapter;
+  private CustomCursorAdapter cursorAdapter;
   private ProgressBar mLoadingIndicator;
   private GridLayoutManager gridLayoutManager;
 
@@ -43,37 +58,65 @@ public class MainActivity extends AppCompatActivity implements
     gridLayoutManager = new GridLayoutManager(this, 2,
         LinearLayoutManager.VERTICAL, false);
     recyclerView.setLayoutManager(gridLayoutManager);
-
-    adapter = new RecyclerViewAdapter(this);
-    recyclerView.setAdapter(adapter);
     mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(this);
+    FavoritesDbHelper favoritesDbHelper = new FavoritesDbHelper(this);
+    adapter = new RecyclerViewAdapter(this);
+    cursorAdapter = new CustomCursorAdapter(this);
 
     loadMoviePosters();
+
   }
+
 
   private void loadMoviePosters() {
     SharedPreferences sharedPreferences = PreferenceManager
         .getDefaultSharedPreferences(this);
-    String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
-    URL moviePosterUrl = null;
-    if (TOP_RATED.equals(value)) {
-      moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
-    } else if (POPULAR.equals(value)) {
-      moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
+    String value = sharedPreferences
+        .getString(getString(R.string.sort_order_key), getString(R.string.sort_default));
+    URL moviePosterUrl;
+    if (FAVORITES.equals(value)) {
+      recyclerView.setAdapter(cursorAdapter);
+      getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
+    } else if (NetworkUtils.isConnected(this)) {
+
+      if (TOP_RATED.equals(value)) {
+        moviePosterUrl = NetworkUtils.buildUrl(TOP_RATED);
+        recyclerView.setAdapter(adapter);
+        new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
+      } else if (POPULAR.equals(value) || getString(R.string.pref_order_label_popular)
+          .equals(value)) {
+        moviePosterUrl = NetworkUtils.buildUrl(POPULAR);
+        recyclerView.setAdapter(adapter);
+        new FetchMoviesAsyncTask(this, new FetchMoviesTaskListener()).execute(moviePosterUrl);
+
+      }
+    } else {
+      Toast.makeText(this, "No connection. Try again later.", Toast.LENGTH_SHORT).show();
     }
 
-    new FetchMoviesAsyncTask().execute(moviePosterUrl);
   }
 
   @Override
-  protected void onPause() {
-    super.onPause();
-    index = gridLayoutManager.findFirstVisibleItemPosition();
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    super.onRestoreInstanceState(savedInstanceState);
+    index = savedInstanceState.getInt(INDEX_KEY);
+    top = savedInstanceState.getInt(TOP_KEY);
+
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    outState.putInt(INDEX_KEY, gridLayoutManager.findFirstVisibleItemPosition());
     View v = recyclerView.getChildAt(0);
     top = (v == null) ? 0 : (v.getTop() - recyclerView.getPaddingTop());
+
+    outState.putInt(TOP_KEY, top);
+
+    super.onSaveInstanceState(outState);
+
   }
 
   @Override
@@ -95,11 +138,19 @@ public class MainActivity extends AppCompatActivity implements
     if (id == R.id.action_settings) {
       Intent settingsIntent = new Intent(this, SettingsActivity.class);
       settingsIntent.putExtra(getString(R.string.changed_settings), false);
-//      startActivityForResult(settingsIntent, ACTIVITY_CONSTANT);
       startActivity(settingsIntent);
       return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    index = gridLayoutManager.findFirstVisibleItemPosition();
+    View v = recyclerView.getChildAt(0);
+    top = (v == null) ? 0 : (v.getTop() - recyclerView.getPaddingTop());
+
   }
 
   @Override
@@ -109,24 +160,15 @@ public class MainActivity extends AppCompatActivity implements
       loadMoviePosters();
       gridLayoutManager.scrollToPosition(0);
       SETTINGS_CHANGED = false;
-    } else if (index != -1) {
-      gridLayoutManager.scrollToPositionWithOffset(index, top);
+    }
+    SharedPreferences sharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    String value = sharedPreferences.getString(getString(R.string.sort_order_key), "");
+
+    if (FAVORITES.equals(value)) {
+      getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, this);
     }
   }
-
-//  @Override
-//  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//    if (resultCode == RESULT_OK && requestCode == ACTIVITY_CONSTANT) {
-//      if (data.hasExtra(getString(R.string.changed_settings))) {
-////        SETTINGS_CHANGED = data.getBooleanExtra(getString(R.string.changed_settings), false);
-//        if (SETTINGS_CHANGED) {
-//          loadMoviePosters();
-//        }
-//      }
-//    }
-//
-//    super.onActivityResult(requestCode, resultCode, data);
-//  }
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -134,21 +176,78 @@ public class MainActivity extends AppCompatActivity implements
   }
 
 
-  public class FetchMoviesAsyncTask extends AsyncTask<URL, Void, List<Movie>> {
+  @Override
+  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    return new AsyncTaskLoader<Cursor>(this) {
+
+      // Initialize a Cursor, this will hold all the task data
+      Cursor mTaskData = null;
+
+      // onStartLoading() is called when a loader first starts loading data
+      @Override
+      protected void onStartLoading() {
+        if (mTaskData != null) {
+          // Delivers any previously loaded data immediately
+          deliverResult(mTaskData);
+        } else {
+          // Force a new load
+          forceLoad();
+        }
+      }
+
+      // loadInBackground() performs asynchronous loading of data
+      @Override
+      public Cursor loadInBackground() {
+        // Will implement to load data
+
+        try {
+          return getContentResolver().query(FavoritesContract.FavoritesEntry.CONTENT_URI,
+              null,
+              null,
+              null,
+              FavoritesContract.FavoritesEntry.COLUMN_MOVIE_TITLE);
+
+        } catch (Exception e) {
+          System.out.println("Failed to asynchronously load data.");
+          System.out.println(e.getMessage());
+          return null;
+        }
+      }
+
+      // deliverResult sends the result of the load, a Cursor, to the registered listener
+      public void deliverResult(Cursor data) {
+        mTaskData = data;
+        super.deliverResult(data);
+      }
+    };
+  }
+
+  @Override
+  public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    cursorAdapter.swapCursor(data);
+  }
+
+  @Override
+  public void onLoaderReset(Loader<Cursor> loader) {
+
+    cursorAdapter.swapCursor(null);
+  }
+
+  public class FetchMoviesTaskListener implements AsyncTaskListener<List<Movie>> {
 
     @Override
-    protected void onPreExecute() {
-      super.onPreExecute();
+    public void onTaskPreExecute() {
       mLoadingIndicator.setVisibility(View.VISIBLE);
+
     }
 
     @Override
-    protected List<Movie> doInBackground(URL... urls) {
-      URL movieRequestUrl = urls[0];
+    public List<Movie> onTaskGetResult(URL url) {
       String jsonString;
       List<Movie> movies;
       try {
-        jsonString = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
+        jsonString = NetworkUtils.getResponseFromHttpUrl(url);
         movies = JsonUtils.getStringsFromJson(jsonString);
       } catch (Exception e) {
         e.printStackTrace();
@@ -158,13 +257,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onPostExecute(List<Movie> movies) {
+    public void onTaskComplete(List<Movie> movies) {
       if (movies != null) {
         recyclerView.setVisibility(View.VISIBLE);
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         adapter.setMovieData(movies);
         adapter.notifyDataSetChanged();
+        gridLayoutManager.scrollToPositionWithOffset(index, top);
       }
     }
   }
+
 }
