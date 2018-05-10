@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.android.popularmoviesstageone.data.FavoritesContract;
@@ -45,6 +46,7 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
   private TrailerRecyclerViewAdapter adapter;
   private RecyclerView reviewRecyclerView;
   private ImageButton favoritesButton;
+  private ScrollView scrollView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,7 @@ public class DetailsActivity extends AppCompatActivity implements OnClickListene
     reviewsTextView = findViewById(R.id.reviews_text);
     favoritesButton = findViewById(R.id.button_favorite);
     favoritesButton.setOnClickListener(this);
+    scrollView = findViewById(R.id.sv_detail);
 
     populateUI();
 
